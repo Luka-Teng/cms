@@ -40,7 +40,7 @@
 	<?php endif ?>
 <?php else : ?>
 	<script>
-		window.location = '/'
+		window.location = '/login'
 	</script>
 <?php endif ?>
 <?php get_footer('admin'); ?>

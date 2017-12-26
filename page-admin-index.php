@@ -4,7 +4,7 @@
 	Welcome to a new CMS template!
 <?php else : ?>
 	<script>
-		window.location = '/'
+		window.location = '/login'
 	</script>
 <?php endif ?>
 <?php get_footer('admin'); ?>
