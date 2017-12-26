@@ -136,23 +136,26 @@ jQuery(document).ready(function($) {
 	//delete a post
 	$(function () {
 		$("#delpost-btn").click(function () {
-			showLoading()
-			var id = $(this).data('value')
-			var url = magicalData.siteURL + '/wp-json/wp/v2/posts/' + id
-			$.ajax({
-				type: 'delete',
-				url: url,
-				beforeSend: function (xhr) {
-			        xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
-			    },
-			    success: function (data) {
-			    	window.location.reload()
-			    },
-			    error: function (data) {
-			    	refreshLoading ()
-			    	showError(data.responseJSON.message)
-			    }
-			})
+			var r=confirm("Are you sure!")
+			if (r==true) {
+				showLoading()
+				var id = $(this).data('value')
+				var url = magicalData.siteURL + '/wp-json/wp/v2/posts/' + id
+				$.ajax({
+					type: 'delete',
+					url: url,
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
+					},
+					success: function (data) {
+						window.location.reload()
+					},
+					error: function (data) {
+						refreshLoading ()
+						showError(data.responseJSON.message)
+					}
+				})
+			}			
 		})
 	})
 	
