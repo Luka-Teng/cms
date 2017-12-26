@@ -2,12 +2,13 @@
 <html <?php language_attributes(); ?>>
 	<head>
 		<meta charset="<?php bloginfo('charset'); ?>">
-		<meta name="viewport" content="width=device-width">
+		<meta name="viewport" content="width=device-width, initial-scale=1" >
 		<title><?php bloginfo('name'); ?></title>
+		<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/css/frontend.css' ?>" type="text/css" media="all">
 		<?php wp_head(); ?>
 	</head>	
 <body <?php body_class(); ?>>	
-	<div class="container">
+	<div class="body-wrapper">
 		<!-- site-header -->
 		<header class="site-header">
 			<a href="<?php echo home_url(); ?>"><?php bloginfo('name'); ?></a>

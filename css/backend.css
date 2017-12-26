@@ -1,0 +1,122 @@
+/*general*/
+.form-divider {
+    height: 1px;
+    background: #eee;
+    margin: 30px 15px 10px;
+}
+/*header*/
+.body-wrapper {
+	width:100%;
+	min-width:1080px;
+}
+.content-wrapper {
+	min-height:500px;
+	background: #333;
+}
+.navbar {
+	margin-bottom: 0px !important;
+}
+/*sidebar*/
+.sidebar {
+    width: 20%;
+    float: left;
+	box-shadow: 0 0 3px 0 rgba(0,0,0,0.4);
+}
+.side-block {
+	border-top: 4px solid #333;
+}
+a.sidebar-block-title {
+    display: block;
+    line-height: 36px;
+    font-size: 15px;
+    padding: 4px 10px;
+    background: #444;
+    color: #fff;
+}
+a.sidebar-block-title:hover, a.sidebar-block-title:focus {
+    color: #fff;
+}
+.sidebar-block-children {
+    background: #eee;
+}
+.sidebar-block-children > a {
+	display: block;
+	padding: 12px;
+	padding-left: 12px;
+	font-size: 13px;
+	color: #555;
+	padding-left: 20px;
+	border-bottom: 1px solid #ddd;
+}
+
+/*main-conten*/
+.main {
+    width: 80%;
+    float: left;
+    min-height: 600px;
+    background: #fff;
+	box-shadow: 0 0 3px 0 rgba(0,0,0,0.4);
+	padding: 15px;
+}
+    .posts-nav{ font-size: 14px;
+        color:rgba(0,0,0,0.44);padding:10px 0}
+    .posts-nav .page-numbers{border-radius: 3px;border:1px solid rgba(0, 0, 0, 0.15);display: inline-block;
+        text-align: center;
+        width: 30px;line-height:30px;margin:0 5px;}
+    .posts-nav .page-numbers.current,.posts-nav .page-numbers:not(.dots):hover{ background: #3b5998;
+        border-color: #3b5998;color:#fff;}
+    .posts-nav .page-numbers.dots{border-color:rgba(0,0,0,0)}
+/*some*/
+.admin-block {
+    padding: 20px;
+    display: block;
+    box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.2);
+}
+.admin-block£>span {
+    line-height:30px;
+}
+.admin-title {
+	padding: 20px 0px;
+	font-size: 20px;
+	color: #555;
+	border-bottom: 2px solid #ccc;
+}
+.admin-newpost {
+    padding: 8px 20px;
+    font-size: 20px;
+    float: right;
+    position: absolute;
+    right: 20px;
+    top: 72px;
+    background: #555;
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.3);
+}
+/*newpost*/
+#wp-newpost-wrap {
+}
+.form {
+	padding: 0px 10px;
+	width: 100%;
+}
+.form-item {
+    padding: 0px 10px;
+}
+.form-item-title {
+    color: #4a4a4a;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 10px 0px;
+	margin-bottom: 0px;
+}
+.form-item-input {
+    border-radius: 5px;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    border: 1px solid #aaa;
+    padding: 5px 10px;
+}
+.form-item-input.block {
+    width: 97%;
+    display: block;
+}

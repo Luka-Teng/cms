@@ -96,7 +96,7 @@ jQuery(document).ready(function($) {
 			        xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
 			    },
 			    success: function (data) {
-			    	window.location = data.link
+			    	window.location = '/admin-post-show/?cat_id=' + categories[0]
 			    },
 			    error: function (data) {
 			    	refreshLoading ()
@@ -172,7 +172,7 @@ jQuery(document).ready(function($) {
 				data: data,
 			    success: function (data) {
 			    	if (data.status === 'success') {
-			    		window.location = '/'
+			    		window.location = '/admin-index'
 			    	} else if (data.status === 'error') {
 			    		refreshLoading ()
 			    		showError(data.message)

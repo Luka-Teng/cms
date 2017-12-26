@@ -1,4 +1,4 @@
-<?php get_header(); ?>
+<?php get_header('admin'); ?>
 <?php if (current_user_can( 'administrator' )) : ?>
 	<?php 
 		$post_id = $_GET['postid'];
@@ -9,11 +9,12 @@
 			<input id='editpost-id' hidden value="<?php echo $post_id ?>">
 			<div class="form-item">
 				<p class="form-item-title">Title</p>
-				<input class="form-item-input block" name="title" id="title" value="<?php echo $current_post->post_title  ?>">
+				<input class="form-control" name="title" id="title" value="<?php echo $current_post->post_title  ?>" required="required">
 			</div>
+			<div class="form-divider"></div>
 			<div class="form-item">
 				<p class="form-item-title">Category</p>
-				<select class="form-item-input block" name="category" id="category">
+				<select class="form-control" name="category" id="category">
 					<?php 
 						$categories = get_all_categories();
 						foreach ($categories as $cat) {
@@ -22,6 +23,7 @@
 					?>
 				</select>
 			</div>
+			<div class="form-divider"></div>
 			<div class="form-item top-gap-1">
 				<p class="form-item-title">Content</p>
 				<?php wp_editor($current_post->post_content, 'newpost', array(
@@ -30,8 +32,8 @@
 			</div>
 		</div>
 		
-		<div class="clearfix" style="margin-right:10%">
-			<a href="javascript:void(0)" id="editpost-btn" class="btn btn-default bot-gap-1 pull-right">UPDATE</a>
+		<div class="clearfix">
+			<a href="javascript:void(0)" id="editpost-btn" class="btn btn-primary pull-right top-gap-1 right-gap-1">UPDATE</a>
 		</div>
 	<?php else : ?>
 		<div>no post exsiting</div>
@@ -41,4 +43,4 @@
 		window.location = '/'
 	</script>
 <?php endif ?>
-<?php get_footer(); ?>
+<?php get_footer('admin'); ?>

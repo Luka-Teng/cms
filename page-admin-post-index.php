@@ -1,4 +1,4 @@
-<?php get_header(); ?>
+<?php get_header('admin'); ?>
 <?php if (current_user_can( 'administrator' )) : ?>
 	<?php $categories = get_all_categories(); ?>
 	<?php foreach($categories as $cat) { ?>
@@ -11,4 +11,4 @@
 		window.location = '/'
 	</script>
 <?php endif ?>
-<?php get_footer(); ?>
+<?php get_footer('admin'); ?>

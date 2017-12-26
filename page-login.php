@@ -1,4 +1,4 @@
-<?php get_header(); ?>
+<?php get_header('admin'); ?>
 <?php if (!is_user_logged_in()) : ?>
   <div class="form">
     <div class="form-item">
@@ -18,4 +18,4 @@
     window.location = '/'
   </script>
 <?php endif ?>
-<?php get_footer(); ?>
+<?php get_footer('admin'); ?>
