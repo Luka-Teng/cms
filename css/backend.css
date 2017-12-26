@@ -49,6 +49,13 @@
 .navbar {
 	margin-bottom: 0px !important;
 }
+.nav-sub-brand{
+    line-height: 50px;
+    display: inline-block;
+    font-size: 12px;
+    position: relative;
+    top: 2px;
+}
 /*sidebar*/
 .sidebar {
     width: 20%;

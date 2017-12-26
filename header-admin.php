@@ -14,7 +14,8 @@
 		<nav class="navbar navbar-inverse border-radius-0" role="navigation">
 			<div class="container-fluid">
 				<div class="navbar-header">
-					<a class="navbar-brand" href="/admin-index">CMS---后台模块</a>
+					<a class="navbar-brand" href="/admin-index">CMS</a>
+					<span class="text-muted nav-sub-brand">后台模块</span>
 				</div>
 				<div>
 					<ul class="nav navbar-nav pull-right">
