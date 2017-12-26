@@ -14,7 +14,7 @@
 		<nav class="navbar navbar-inverse border-radius-0" role="navigation">
 			<div class="container-fluid">
 				<div class="navbar-header">
-					<a class="navbar-brand" href="<?php echo home_url(); ?>"><?php bloginfo('name'); ?></a>
+					<a class="navbar-brand" href="<?php echo home_url(); ?>">CMS</a>
 				</div>
 				<div>
 					<ul class="nav navbar-nav pull-right">
