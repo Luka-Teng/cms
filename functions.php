@@ -7,12 +7,13 @@
 <?php 
 	//load all js or css resources
 	function learning_resources() {	
-		wp_enqueue_style('bootstrap_css', get_stylesheet_uri());
-		wp_enqueue_style('style', get_template_directory_uri() . '/css/bootstrap.min.css');		
+		wp_enqueue_style('style', get_stylesheet_uri());
+		wp_enqueue_style('bootstrap_css', get_template_directory_uri() . '/css/bootstrap.min.css');
 		wp_enqueue_script('main_js', get_template_directory_uri() . '/js/main.js', array(
 			jquery => 'jquery'
 		), 1.0, true);
 		wp_enqueue_script('bootstrap_js', get_template_directory_uri() . '/js/bootstrap.min.js');
+		wp_enqueue_script('validate_js', get_template_directory_uri() . '/js/validate.js');
 		wp_localize_script('main_js', 'magicalData', array(
 			'nonce' => wp_create_nonce('wp_rest'),
 			'siteURL' => get_site_url()

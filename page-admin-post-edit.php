@@ -9,7 +9,7 @@
 			<input id='editpost-id' hidden value="<?php echo $post_id ?>">
 			<div class="form-item">
 				<p class="form-item-title">Title</p>
-				<input class="form-control" name="title" id="title" value="<?php echo $current_post->post_title  ?>" required="required">
+				<input class="form-control required" name="title" id="title" value="<?php echo $current_post->post_title  ?>">
 			</div>
 			<div class="form-divider"></div>
 			<div class="form-item">

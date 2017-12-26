@@ -4,6 +4,39 @@
     background: #eee;
     margin: 30px 15px 10px;
 }
+.alert-panel{
+	position: absolute;
+	width: 300px;
+	border-radius: 4px;
+	font-size: 12px;
+	background: #da4467;
+	right: 9px;
+	top: 86px;
+	color: white;
+	border: 1px solid #da4467;
+	padding: 5px 10px;
+	animation: AlertFadeIn 1s;
+	z-index: 2;
+}
+
+@keyframes AlertFadeIn{
+	0%{opacity:0}
+	100%{opacity:1}
+}
+.alert-panel:after{
+	content:" ";
+	width:10px;
+	height:10px;
+	transform:rotate(45deg);
+	position:absolute;
+	background:#da4467;
+	border:1px solid #da4467;
+	border-right:0px;
+	border-bottom:0px;
+	top:-6px;
+	right:10px;
+}
+
 /*header*/
 .body-wrapper {
 	width:100%;

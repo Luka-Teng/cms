@@ -31,9 +31,30 @@ jQuery(document).ready(function($) {
 		})
 		canDownload('/wp-content/uploads')
 	})
+	
+	//form validate
+	$("input.required").validate({
+		test: [{
+			case: 'nonzero',
+			message: 'cant not be blank!!'
+		}]
+	})
+	
+	//check valid
+	function isValid() {
+		if ($(".alert-panel").length > 0) return false 
+		return true
+	}
+	
 	//new post
 	$(function () {
 		$("#post-btn").click(function () {
+			//check if it is valid
+			if (!isValid()) {
+				$("html,body").scrollTop($(".alert-panel").first().offset().top-120)
+				return
+			}
+			
 			showLoading ()
 			var content
 			var categories = [$("#category").val()]
@@ -72,6 +93,12 @@ jQuery(document).ready(function($) {
 	//edit a post
 	$(function () {
 		$("#editpost-btn").click(function () {
+			//check if it is valid
+			if (!isValid()) {
+				$("html,body").scrollTop($(".alert-panel").first().offset().top-120)
+				return
+			}
+			
 			showLoading ()
 			var content
 			var categories = [$("#category").val()]

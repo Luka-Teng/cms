@@ -6,7 +6,7 @@
 	<div class="form">
 		<div class="form-item">
 			<p class="form-item-title">Title</p>
-			<input class="form-control" name="title" id="title">
+			<input class="form-control required" name="title" id="title">
 		</div>
 		<div class="form-divider"></div>
 		<div class="form-item">
