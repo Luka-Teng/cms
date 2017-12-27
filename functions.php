@@ -41,9 +41,8 @@
 	global $wpdb;
 	define('CAROUSEL_TABLE', $wpdb->prefix . 'Carousel');
 	// 插件激活时，运行回调方法创建数据表, 在WP原有的options表中插入插件版本号
-	add_action('after_switch_theme', 'createCarousel');
-	add_action('after_switch_theme', 'initCarousel');
-	function createCarousel() {
+	add_action('after_switch_theme', 'initdb');
+	function initdb() {
 	    /*
 	     * We'll set the default character set and collation for this table.
 	     * If we don't do this, some characters could end up being converted 
@@ -66,17 +65,18 @@
 	        name varchar(20) NOT NULL,
 	        UNIQUE KEY id (id)
 	    ) $charset_collate;";
-
+		$sql2 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_1')";
+		$sql3 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_2')";
+		$sql4 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_3')";
+		$sql5 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_4')";
+		$sql6 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_5')";
 	    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 	    dbDelta( $sql1 );
-	}
-	function initCarousel() {
-		global $wpdb;
-		$wpdb->insert( 'cms_carousel', array( url => '/', name => 'carousel_1' ) );
-		$wpdb->insert( 'cms_carousel', array( url => '/', name => 'carousel_2' ) );
-		$wpdb->insert( 'cms_carousel', array( url => '/', name => 'carousel_3' ) );
-		$wpdb->insert( 'cms_carousel', array( url => '/', name => 'carousel_4' ) );
-		$wpdb->insert( 'cms_carousel', array( url => '/', name => 'carousel_5' ) );
+		dbDelta( $sql2 );
+		dbDelta( $sql3 );
+		dbDelta( $sql4 );
+		dbDelta( $sql5 );
+		dbDelta( $sql6 );
 	}
 ?>
 
@@ -128,6 +128,7 @@
 			if ($_FILES["file"]["error"] > 0) {
 				return new WP_Error( 'file error', $_FILES["file"]["error"], array(status => '505') );
 			} else {
+				global $wpdb;
 				$dir_path = 'wp-content/themes/cms/upload';
 				$file_path = 'wp-content/themes/cms/upload/'.$_FILES["file"]["name"];
 				if (!file_exists($dir_path)) {
@@ -136,15 +137,14 @@
 				if (!file_exists($file_path)) {
 					move_uploaded_file($_FILES["file"]["tmp_name"], $file_path);
 				}
-				global $wpdb;
-				$wpdb->insert( 'cms_carousel', array( url => $file_path, name => 'luka' ));
+				$wpdb->insert( 'cms_carousel', array( 'url' => $file_path, 'url' => 'luka' ));
 				$wpdb->show_errors();
 				if ($wpdb->last_error) {
 					return new WP_Error( 'database error', $wpdb->last_error, array(status => '505') );
 				} else {
 					return array(
-						status => '200',
-						message => 'success'
+						'status' => '200',
+						'message' => 'success'
 					);
 				}
 				

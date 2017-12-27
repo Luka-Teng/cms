@@ -21,7 +21,7 @@
 					<div class="nav-item">
 					 	<a href="<?php echo get_category_link($cat->term_id) ?>"><?php echo $cat->name ?></a>
 					 	<div class="nav-item-child">
-							<?php $all_posts = get_posts(array(category => $cat->term_id)); ?>
+							<?php $all_posts = get_posts(array('category' => $cat->term_id)); ?>
 							
 							<?php foreach($all_posts as $single_post) { ?>
 								<a href='<?php echo get_the_permalink($single_post->ID) ?>'>
