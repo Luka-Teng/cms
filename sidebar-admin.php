@@ -10,6 +10,9 @@
 	</div>
 	<div class="side-block">
 		<a class="sidebar-block-title" href="javascript:void(0)">轮播图管理</a>
+		<div class="collapse in sidebar-block-children" id="side-bar-1">
+			<a href="/admin-carousel">定制轮播图</a>
+		</div>
 	</div>
 	<div class="side-block">
 		<a class="sidebar-block-title" href="javascript:void(0)">用户申请</a>
