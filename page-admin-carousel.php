@@ -1,9 +1,8 @@
 <?php get_header('admin'); ?>
 <?php if (current_user_can( 'administrator' )) : ?>
-	<form action='/wp-json/apis/upload' method='POST' enctype="multipart/form-data">
-	<input type='file' name='file'>
-	<button>submit</button>
-	</form>
+	<input type='file' name='carousel_1' id='carousel_1'>
+	<button id="carousel-upload-btn">submit</button>
+	<button id="carousel-delete-btn" data-carousel="carousel_1">delete</button>
 <?php else : ?>
 	<script>
 		window.location = '/login'

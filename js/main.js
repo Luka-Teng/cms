@@ -159,20 +159,50 @@ jQuery(document).ready(function($) {
 		})
 	})
 	
-	//upload
+	//carousel upload
 	$(function () {
-		$("#upload-btn").click(function () {
+		$("#carousel-upload-btn").click(function () {
 			showLoading ()
-			var file = document.getElementById('file').files[0]
+			var file = document.getElementById('carousel_1').files[0]
 			var form_data=new FormData()
-			form_data.append("file",file)
-			var url = magicalData.siteURL + '/wp-json/apis/upload'
+			form_data.append("carousel_1",file)
+			var url = magicalData.siteURL + '/wp-json/apis/carousel_upload'
 			$.ajax({
 				type: 'post',
 				url: url,
 				data: form_data,
 				contentType:false,
 				processData:false,
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
+				},
+			    success: function (data) {
+			    	refreshLoading ()
+			    	console.log(data)
+			    },
+			    error: function (data) {
+			    	refreshLoading ()
+			    	showError(data.responseJSON.message)
+			    }
+			})
+		})
+	})
+	
+	//carousel delete
+	$(function () {
+		$("#carousel-delete-btn").click(function () {
+			showLoading ()
+			var data = {
+				carousel_name: $(this).data('carousel')
+			}
+			var url = magicalData.siteURL + '/wp-json/apis/carousel_delete'
+			$.ajax({
+				type: 'delete',
+				url: url,
+				data: data,
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
+				},
 			    success: function (data) {
 			    	refreshLoading ()
 			    	console.log(data)
