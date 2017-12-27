@@ -10,7 +10,7 @@
 		wp_enqueue_style('style', get_stylesheet_uri());
 		wp_enqueue_style('bootstrap_css', get_template_directory_uri() . '/css/bootstrap.min.css');
 		wp_enqueue_script('main_js', get_template_directory_uri() . '/js/main.js', array(
-			jquery => 'jquery'
+			'jquery' => 'jquery'
 		), 1.0, true);
 		wp_enqueue_script('bootstrap_js', get_template_directory_uri() . '/js/bootstrap.min.js');
 		wp_enqueue_script('validate_js', get_template_directory_uri() . '/js/validate.js');
@@ -26,11 +26,11 @@
 	//show all categories
 	function get_all_categories () {
 		return get_categories(array(
-			taxonomy => 'category',
-			hide_empty => false,
-			exclude => 1,
-			orderby => 'term_id',
-			order => 'ASC'
+			'taxonomy' => 'category',
+			'hide_empty' => false,
+			'exclude' => 1,
+			'orderby' => 'term_id',
+			'order' => 'ASC'
 		));
 	}
 ?>
@@ -40,10 +40,10 @@
 	// 声明全局变量$wpdb 和 数据表名常量
 	global $wpdb;
 	define('CAROUSEL_TABLE', $wpdb->prefix . 'Carousel');
-	define('REGISTRATION_TABLE', $wpdb->prefix . 'Registration');
 	// 插件激活时，运行回调方法创建数据表, 在WP原有的options表中插入插件版本号
-	add_action('after_setup_theme', 'createTable');
-	function createTable() {
+	add_action('after_switch_theme', 'createCarousel');
+	add_action('after_switch_theme', 'initCarousel');
+	function createCarousel() {
 	    /*
 	     * We'll set the default character set and collation for this table.
 	     * If we don't do this, some characters could end up being converted 
@@ -69,6 +69,14 @@
 
 	    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 	    dbDelta( $sql1 );
+	}
+	function initCarousel() {
+		global $wpdb;
+		$wpdb->insert( 'cms_carousel', array( url => '/', name => 'carousel_1' ) );
+		$wpdb->insert( 'cms_carousel', array( url => '/', name => 'carousel_2' ) );
+		$wpdb->insert( 'cms_carousel', array( url => '/', name => 'carousel_3' ) );
+		$wpdb->insert( 'cms_carousel', array( url => '/', name => 'carousel_4' ) );
+		$wpdb->insert( 'cms_carousel', array( url => '/', name => 'carousel_5' ) );
 	}
 ?>
 
@@ -109,11 +117,11 @@
 			'apis', 'upload',
 			array(
 				'methods'  => 'POST',
-				'callback' => 'custom_upload',
+				'callback' => 'carousel_upload',
 			)
 		);
 	}
-	function custom_upload($request){
+	function carousel_upload($request){
 		if ((($_FILES["file"]["type"] == "image/gif") || ($_FILES["file"]["type"] == "image/jpeg")
 			|| ($_FILES["file"]["type"] == "image/jpg") || ($_FILES["file"]["type"] == "image/pjpeg"))
 			&& ($_FILES["file"]["size"] < 20000)) {
@@ -129,11 +137,17 @@
 					move_uploaded_file($_FILES["file"]["tmp_name"], $file_path);
 				}
 				global $wpdb;
-				$wpdb->insert( 'cms_carousel', array( url => $file_path ) ); 
-				return array(
-					status => '200',
-					message => 'success'
-				);
+				$wpdb->insert( 'cms_carousel', array( url => $file_path, name => 'luka' ));
+				$wpdb->show_errors();
+				if ($wpdb->last_error) {
+					return new WP_Error( 'database error', $wpdb->last_error, array(status => '505') );
+				} else {
+					return array(
+						status => '200',
+						message => 'success'
+					);
+				}
+				
 			}
 	  } else {
 	  	return new WP_Error( 'invalid file', 'invalid file', array(status => '505') );
