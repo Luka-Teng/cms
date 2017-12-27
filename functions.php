@@ -6,7 +6,7 @@
 
 <?php 
 	//load all js or css resources
-	function learning_resources() {	
+	function loading_resources() {	
 		wp_enqueue_style('style', get_stylesheet_uri());
 		wp_enqueue_style('bootstrap_css', get_template_directory_uri() . '/css/bootstrap.min.css');
 		wp_enqueue_script('main_js', get_template_directory_uri() . '/js/main.js', array(
@@ -19,7 +19,7 @@
 			'siteURL' => get_site_url()
 		));		
 	}
-	add_action('wp_enqueue_scripts', 'learning_resources');
+	add_action('wp_enqueue_scripts', 'loading_resources');
  ?>
 
 <?php 
@@ -49,15 +49,12 @@
 	     * to just ?'s when saved in our table.
 	     */
 	    $charset_collate = '';
-
 	    if (!empty($wpdb->charset)) {
 	      $charset_collate = "DEFAULT CHARACTER SET {$wpdb->charset}";
 	    }
-
 	    if (!empty( $wpdb->collate)) {
 	      $charset_collate .= " COLLATE {$wpdb->collate}";
 	    }
-
 	    $sql1 = "CREATE TABLE " . CAROUSEL_TABLE . " (
 	        id mediumint(9) NOT NULL AUTO_INCREMENT,
 	        time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -82,6 +79,18 @@
 
 <?php
 	//apis
+	
+	//if it is administrator?
+	function isAdministrator() {
+		if (current_user_can( 'administrator' )) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/******************************************************/
+	
 	//define the login api 
 	add_action( 'rest_api_init', 'login_hook' );
 	function login_hook() {
@@ -101,46 +110,53 @@
 		$user = wp_signon( $creds, false );
 		if (is_wp_error($user)) {
 			return array(
-				status => 'error',
-				message => $user->get_error_message()
+				'status' => 'error',
+				'message' => $user->get_error_message()
 			);
 		}
         return array(
-        	status => 'success',
-        	message => $user
+        	'status' => 'success',
+        	'message' => $user
         );
 	}
-	//define upload api 
-	add_action( 'rest_api_init', 'upload_hook' );
-	function upload_hook() {
+	
+	/******************************************************/
+	
+	//define carousel_upload api 
+	add_action( 'rest_api_init', 'carousel_upload_hook' );
+	function carousel_upload_hook() {
 		register_rest_route(
-			'apis', 'upload',
+			'apis', 'carousel_upload',
 			array(
 				'methods'  => 'POST',
 				'callback' => 'carousel_upload',
+				'permission_callback' => function () {
+					return isAdministrator();
+				}
 			)
 		);
 	}
-	function carousel_upload($request){
-		if ((($_FILES["file"]["type"] == "image/gif") || ($_FILES["file"]["type"] == "image/jpeg")
-			|| ($_FILES["file"]["type"] == "image/jpg") || ($_FILES["file"]["type"] == "image/pjpeg"))
-			&& ($_FILES["file"]["size"] < 20000)) {
-			if ($_FILES["file"]["error"] > 0) {
-				return new WP_Error( 'file error', $_FILES["file"]["error"], array(status => '505') );
+	//--specific carousel_upload method
+	function carousel_upload_func($name) {
+		if ((($_FILES[$name]["type"] == "image/gif") || ($_FILES[$name]["type"] == "image/jpeg")
+			|| ($_FILES[$name]["type"] == "image/jpg") || ($_FILES[$name]["type"] == "image/pjpeg"))
+			&& ($_FILES[$name]["size"] < 20000)) {
+			if ($_FILES[$name]["error"] > 0) {
+				return new WP_Error( 'file error', $_FILES[$name]["error"], array(status => '505') );
 			} else {
 				global $wpdb;
 				$dir_path = 'wp-content/themes/cms/upload';
-				$file_path = 'wp-content/themes/cms/upload/'.$_FILES["file"]["name"];
+				$file_path = 'wp-content/themes/cms/upload/'.$_FILES[$name]["name"];
 				if (!file_exists($dir_path)) {
 					mkdir($dir_path, 0700);
 				}
 				if (!file_exists($file_path)) {
-					move_uploaded_file($_FILES["file"]["tmp_name"], $file_path);
+					move_uploaded_file($_FILES[$name]["tmp_name"], $file_path);
 				}
-				$wpdb->insert( 'cms_carousel', array( 'url' => $file_path, 'url' => 'luka' ));
+				$wpdb->update( 'cms_carousel', array( 'url' => $file_path), array('name' => $name));
 				$wpdb->show_errors();
 				if ($wpdb->last_error) {
-					return new WP_Error( 'database error', $wpdb->last_error, array(status => '505') );
+					return new WP_Error( 'database error', $wpdb->last_error, array('status' => '505') );
 				} else {
 					return array(
 						'status' => '200',
@@ -150,7 +166,54 @@
 				
 			}
 	  } else {
-	  	return new WP_Error( 'invalid file', 'invalid file', array(status => '505') );
+	  	return new WP_Error( 'invalid file', 'invalid file', array('status' => '505') );
 	  }
 	}
+	//carousel_upload method
+	function carousel_upload($request){
+		$white_names = ['carousel_1', 'carousel_2', 'carousel_3', 'carousel_4', 'carousel_5'];
+		foreach ($white_names as $name) {
+			if (isset($_FILES[$name])) {
+				return carousel_upload_func($name);
+			}
+		}
+		return new WP_error('file name error', 'please rename the file', array('status' => '505'));
+	}
+	
+	/******************************************************/
+	
+	//define carousel_delete api 
+	add_action( 'rest_api_init', 'carousel_delete_hook' );
+	function carousel_delete_hook() {
+		register_rest_route(
+			'apis', 'carousel_delete',
+			array(
+				'methods'  => 'DELETE',
+				'callback' => 'carousel_delete',
+				'permission_callback' => function () {
+					return isAdministrator();
+				}
+			)
+		);
+	}
+	//carousel_delete method
+	function carousel_delete($request){
+		$carousel_name = $request['carousel_name'];
+		$white_names = ['carousel_1', 'carousel_2', 'carousel_3', 'carousel_4', 'carousel_5'];
+		if (in_array($carousel_name, $white_names)) {
+			global $wpdb;
+			$wpdb->update( 'cms_carousel', array( 'url' => '/'), array('name' => $carousel_name));
+			$wpdb->show_errors();
+			if ($wpdb->last_error) {
+				return new WP_Error( 'database error', $wpdb->last_error, array('status' => '505') );
+			} else {
+				return array(
+					'status' => '200',
+					'message' => 'success'
+				);
+			}
+		}
+		return new WP_error('file name error', 'pls rename the file', array('status' => '505'));
+	}
+	
 ?>
