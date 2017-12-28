@@ -232,7 +232,7 @@ jQuery(document).ready(function($) {
 	//carousel delete
 	$(function () {
 		$(".carousel-delete-btn").click(function () {
-			var r=confirm("Are you sure!")
+			var r=confirm("删除后将无法恢复!")
 			if (r==true) {
 				showLoading ()
 				var carousel_name = $(this).data('carousel')
