@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-	//error handling
+	//common tools handling
 	function showError (msg) {
 		msg === '' ? msg = 'error' : ''
 		$("#error")
@@ -17,19 +17,56 @@ jQuery(document).ready(function($) {
 	function refreshLoading () {
 		$("#loading").removeClass("active")
 	}
+	function showflash (msg, type) {
+		msg === '' ? msg = 'done!' : ''
+		var colors = {
+			error: '#ed222e',
+			success: '#99cc00'
+		}
+		$("#flash")
+			.clone().appendTo("body")
+			.show()
+			.find('.flash-content').html(msg).css('background', colors[type])
+			.parent()
+			.fadeOut(2000, function () {
+				$(this).remove()
+			})
+	}
 	function canDownload (url_pattern) {
 		var list = $('a[href*="'+url_pattern+'"]')
 		list.each(function () {
 			var name = $(this).html()
 			$(this).prop("download", name)
 		})
-	}  
+	}
+
+	//show images when uploading files
+	function onFilePicked(file, target) {
+		let filename = file.name
+		if (filename.lastIndexOf('.') <= 0) {
+		  return alert('Please add a valid file!')
+		}
+		const fileReader = new FileReader()
+		fileReader.addEventListener('load', () => {
+		  target.src = fileReader.result
+		})
+		fileReader.readAsDataURL(file)
+	}
+	
+	//init
 	$(function () {
-		//init
+		//取消错误
 		$("#error .error-remove").click(function () {
 			refreshError()
 		})
-		canDownload('/wp-content/uploads')
+		//提供下载链接
+		canDownload('/wp-content/uploads');
+		//上传图片显示
+		[1,2,3,4,5].forEach(function (element) {
+			$('#carousel_' + element).change(function (event) {
+				onFilePicked(event.target.files[0], document.getElementById('carousel-target-' + element))
+			}) 
+		})
 	})
 	
 	//form validate
@@ -161,11 +198,13 @@ jQuery(document).ready(function($) {
 	
 	//carousel upload
 	$(function () {
-		$("#carousel-upload-btn").click(function () {
+		$(".carousel-upload-btn").click(function () {
 			showLoading ()
-			var file = document.getElementById('carousel_1').files[0]
+			var that = $(this)
+			var carousel_name = $(this).data('carousel')
+			var file = document.getElementById(carousel_name).files[0]
 			var form_data=new FormData()
-			form_data.append("carousel_1",file)
+			form_data.append(carousel_name,file)
 			var url = magicalData.siteURL + '/wp-json/apis/carousel_upload'
 			$.ajax({
 				type: 'post',
@@ -178,6 +217,8 @@ jQuery(document).ready(function($) {
 				},
 			    success: function (data) {
 			    	refreshLoading ()
+			    	showflash('上传成功', 'success')
+			    	that.parent().addClass("active")
 			    	console.log(data)
 			    },
 			    error: function (data) {
@@ -190,10 +231,12 @@ jQuery(document).ready(function($) {
 	
 	//carousel delete
 	$(function () {
-		$("#carousel-delete-btn").click(function () {
+		$(".carousel-delete-btn").click(function () {
 			showLoading ()
+			var carousel_name = $(this).data('carousel')
+			var that = $(this)
 			var data = {
-				carousel_name: $(this).data('carousel')
+				carousel_name: carousel_name
 			}
 			var url = magicalData.siteURL + '/wp-json/apis/carousel_delete'
 			$.ajax({
@@ -205,6 +248,10 @@ jQuery(document).ready(function($) {
 				},
 			    success: function (data) {
 			    	refreshLoading ()
+			    	showflash('删除成功', 'success')
+			    	document.getElementById('carousel-target-' + carousel_name.split('carousel_')[1]).src 
+			    		= window.location.origin + '/wp-content/themes/cms/img/alt.jpg'
+			    	that.parent().removeClass("active")
 			    	console.log(data)
 			    },
 			    error: function (data) {

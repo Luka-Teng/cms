@@ -23,6 +23,13 @@
  ?>
 
 <?php 
+	//some helper functions
+	function equal_and_set_values ($origin, $target, $true_value, $false_value) {
+		if ( $origin == $target) {
+			return $true_value;
+		}
+		return $false_value;
+	}
 	//show all categories
 	function get_all_categories () {
 		return get_categories(array(
@@ -39,7 +46,7 @@
 	//adding new tables
 	// 声明全局变量$wpdb 和 数据表名常量
 	global $wpdb;
-	define('CAROUSEL_TABLE', $wpdb->prefix . 'Carousel');
+	define('CAROUSEL_TABLE', $wpdb->prefix . 'carousel');
 	// 插件激活时，运行回调方法创建数据表, 在WP原有的options表中插入插件版本号
 	add_action('after_switch_theme', 'initdb');
 	function initdb() {
@@ -153,7 +160,7 @@
 				if (!file_exists($file_path)) {
 					move_uploaded_file($_FILES[$name]["tmp_name"], $file_path);
 				}
-				$wpdb->update( 'cms_carousel', array( 'url' => $file_path), array('name' => $name));
+				$wpdb->update($wpdb->prefix . 'carousel', array( 'url' => $file_path), array('name' => $name));
 				$wpdb->show_errors();
 				if ($wpdb->last_error) {
 					return new WP_Error( 'database error', $wpdb->last_error, array('status' => '505') );
@@ -177,7 +184,7 @@
 				return carousel_upload_func($name);
 			}
 		}
-		return new WP_error('file name error', 'please rename the file', array('status' => '505'));
+		return new WP_error('file error', '文件为空，请重新上传文件', array('status' => '505'));
 	}
 	
 	/******************************************************/
@@ -202,7 +209,7 @@
 		$white_names = ['carousel_1', 'carousel_2', 'carousel_3', 'carousel_4', 'carousel_5'];
 		if (in_array($carousel_name, $white_names)) {
 			global $wpdb;
-			$wpdb->update( 'cms_carousel', array( 'url' => '/'), array('name' => $carousel_name));
+			$wpdb->update($wpdb->prefix . 'carousel', array( 'url' => '/'), array('name' => $carousel_name));
 			$wpdb->show_errors();
 			if ($wpdb->last_error) {
 				return new WP_Error( 'database error', $wpdb->last_error, array('status' => '505') );
@@ -213,7 +220,7 @@
 				);
 			}
 		}
-		return new WP_error('file name error', 'pls rename the file', array('status' => '505'));
+		return new WP_error('file error', '请重新操作', array('status' => '505'));
 	}
 	
 ?>

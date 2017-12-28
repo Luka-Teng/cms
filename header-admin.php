@@ -40,4 +40,5 @@
 				<!--common tools-->
 				<?php get_template_part('common/loading', '') ?>
 				<?php get_template_part('common/error', '') ?>
+				<?php get_template_part('common/flash', '') ?>
 				<!--common tools-->
