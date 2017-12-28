@@ -173,7 +173,7 @@
 				
 			}
 	  } else {
-	  	return new WP_Error( 'invalid file', 'invalid file', array('status' => '505') );
+	  	return new WP_Error( 'invalid file', '必须为图片格式，且不能超过2MB', array('status' => '505') );
 	  }
 	}
 	//carousel_upload method
