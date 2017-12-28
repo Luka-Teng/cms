@@ -223,7 +223,7 @@ jQuery(document).ready(function($) {
 			    },
 			    error: function (data) {
 			    	refreshLoading ()
-			    	showError(data.responseJSON.message)
+			    	showflash(data.responseJSON.message, 'error')
 			    }
 			})
 		})
@@ -259,7 +259,7 @@ jQuery(document).ready(function($) {
 				    },
 				    error: function (data) {
 				    	refreshLoading ()
-				    	showError(data.responseJSON.message)
+				    	showflash(data.responseJSON.message, 'error')
 				    }
 				})
 			}
