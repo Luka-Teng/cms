@@ -232,34 +232,37 @@ jQuery(document).ready(function($) {
 	//carousel delete
 	$(function () {
 		$(".carousel-delete-btn").click(function () {
-			showLoading ()
-			var carousel_name = $(this).data('carousel')
-			var that = $(this)
-			var data = {
-				carousel_name: carousel_name
+			var r=confirm("Are you sure!")
+			if (r==true) {
+				showLoading ()
+				var carousel_name = $(this).data('carousel')
+				var that = $(this)
+				var data = {
+					carousel_name: carousel_name
+				}
+				var url = magicalData.siteURL + '/wp-json/apis/carousel_delete'
+				$.ajax({
+					type: 'delete',
+					url: url,
+					data: data,
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
+					},
+				    success: function (data) {
+				    	refreshLoading ()
+				    	showflash('删除成功', 'success')
+				    	document.getElementById(carousel_name).value = ''
+				    	document.getElementById('carousel-target-' + carousel_name.split('carousel_')[1]).src 
+				    		= window.location.origin + '/wp-content/themes/cms/img/alt.jpg'
+				    	that.parent().removeClass("active")
+				    	console.log(data)
+				    },
+				    error: function (data) {
+				    	refreshLoading ()
+				    	showError(data.responseJSON.message)
+				    }
+				})
 			}
-			var url = magicalData.siteURL + '/wp-json/apis/carousel_delete'
-			$.ajax({
-				type: 'delete',
-				url: url,
-				data: data,
-				beforeSend: function (xhr) {
-					xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
-				},
-			    success: function (data) {
-			    	refreshLoading ()
-			    	showflash('删除成功', 'success')
-			    	document.getElementById(carousel_name).value = ''
-			    	document.getElementById('carousel-target-' + carousel_name.split('carousel_')[1]).src 
-			    		= window.location.origin + '/wp-content/themes/cms/img/alt.jpg'
-			    	that.parent().removeClass("active")
-			    	console.log(data)
-			    },
-			    error: function (data) {
-			    	refreshLoading ()
-			    	showError(data.responseJSON.message)
-			    }
-			})
 		})
 	})
 
