@@ -249,6 +249,7 @@ jQuery(document).ready(function($) {
 			    success: function (data) {
 			    	refreshLoading ()
 			    	showflash('删除成功', 'success')
+			    	document.getElementById(carousel_name).value = ''
 			    	document.getElementById('carousel-target-' + carousel_name.split('carousel_')[1]).src 
 			    		= window.location.origin + '/wp-content/themes/cms/img/alt.jpg'
 			    	that.parent().removeClass("active")
