@@ -144,6 +144,7 @@
 		);
 	}
 	//--specific carousel_upload method
+	//--have to set the auth in linux: sudo chmod -R 777 myResources
 	function carousel_upload_func($name) {
 		if ((($_FILES[$name]["type"] == "image/gif") || ($_FILES[$name]["type"] == "image/jpeg")
 			|| ($_FILES[$name]["type"] == "image/jpg") || ($_FILES[$name]["type"] == "image/pjpeg"))
@@ -222,7 +223,7 @@
 		}
 		return new WP_error('file error', '请重新操作', array('status' => '505'));
 	}
-
+/*
 	//define excel api 
 	add_action( 'rest_api_init', 'excel_hook' );
 	function excel_hook() {
@@ -262,4 +263,5 @@
 	    //输出即提示下载    
 	    echo $ReportContent;    
 		}
+		*/
 ?>
