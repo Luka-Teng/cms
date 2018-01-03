@@ -47,6 +47,9 @@
 	// 声明全局变量$wpdb 和 数据表名常量
 	global $wpdb;
 	define('CAROUSEL_TABLE', $wpdb->prefix . 'carousel');
+	define('MEDIA_TABLE', $wpdb->prefix . 'media_applicant');
+	define('SHOW_TABLE', $wpdb->prefix . 'show_applicant');
+	define('AUDIENCE_TABLE', $wpdb->prefix . 'audience_applicant');
 	// 插件激活时，运行回调方法创建数据表, 在WP原有的options表中插入插件版本号
 	add_action('after_switch_theme', 'initdb');
 	function initdb() {
@@ -55,32 +58,46 @@
 	     * If we don't do this, some characters could end up being converted 
 	     * to just ?'s when saved in our table.
 	     */
+	    global $wpdb;
 	    $charset_collate = '';
 	    if (!empty($wpdb->charset)) {
 	      $charset_collate = "DEFAULT CHARACTER SET {$wpdb->charset}";
 	    }
 	    if (!empty( $wpdb->collate)) {
 	      $charset_collate .= " COLLATE {$wpdb->collate}";
+	    }	    
+	    //创建媒体登记数据库
+	    if ($wpdb->get_var('show tables like "' . MEDIA_TABLE . '"') != MEDIA_TABLE) {
+	    	$sql1 = "CREATE TABLE " . MEDIA_TABLE . " (
+		        id mediumint(9) NOT NULL AUTO_INCREMENT,
+		        time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		        company varchar(55) DEFAULT '' NOT NULL,
+		        name varchar(20) NOT NULL,
+		        UNIQUE KEY id (id)
+		    ) $charset_collate;";
 	    }
-	    $sql1 = "CREATE TABLE " . CAROUSEL_TABLE . " (
-	        id mediumint(9) NOT NULL AUTO_INCREMENT,
-	        time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	        url varchar(55) DEFAULT '' NOT NULL,
-	        name varchar(20) NOT NULL,
-	        UNIQUE KEY id (id)
-	    ) $charset_collate;";
-		$sql2 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_1')";
-		$sql3 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_2')";
-		$sql4 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_3')";
-		$sql5 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_4')";
-		$sql6 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_5')";
-	    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-	    dbDelta( $sql1 );
-		dbDelta( $sql2 );
-		dbDelta( $sql3 );
-		dbDelta( $sql4 );
-		dbDelta( $sql5 );
-		dbDelta( $sql6 );
+	    //创建轮播图数据库
+	    if ($wpdb->get_var('show tables like "' . CAROUSEL_TABLE . '"') != CAROUSEL_TABLE) {
+	    	$sql3_1 = "CREATE TABLE " . CAROUSEL_TABLE . " (
+		        id mediumint(9) NOT NULL AUTO_INCREMENT,
+		        time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		        url varchar(55) DEFAULT '' NOT NULL,
+		        name varchar(20) NOT NULL,
+		        UNIQUE KEY id (id)
+		    ) $charset_collate;";
+			$sql3_2 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_1')";
+			$sql3_3 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_2')";
+			$sql3_4 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_3')";
+			$sql3_5 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_4')";
+			$sql3_6 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_5')";
+		    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		    dbDelta( $sql3_1 );
+			dbDelta( $sql3_2 );
+			dbDelta( $sql3_3 );
+			dbDelta( $sql3_4 );
+			dbDelta( $sql3_5 );
+			dbDelta( $sql3_6 );
+	    }	    
 	}
 ?>
 
@@ -147,7 +164,7 @@
 	//--have to set the auth in linux: sudo chmod -R 777 myResources
 	function carousel_upload_func($name) {
 		if ((($_FILES[$name]["type"] == "image/gif") || ($_FILES[$name]["type"] == "image/jpeg")
-			|| ($_FILES[$name]["type"] == "image/jpg") || ($_FILES[$name]["type"] == "image/pjpeg"))
+			|| ($_FILES[$name]["type"] == "image/jpg") || ($_FILES[$name]["type"] == "image/pjpeg") || ($_FILES[$name]["type"] == "image/png"))
 			&& ($_FILES[$name]["size"] < 1000000)) {
 			if ($_FILES[$name]["error"] > 0) {
 				return new WP_Error( 'file error', $_FILES[$name]["error"], array(status => '505') );

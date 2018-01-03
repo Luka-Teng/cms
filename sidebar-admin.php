@@ -9,9 +9,9 @@
 		</div>
 	</div>
 	<div class="side-block">
-		<a class="sidebar-block-title" href="javascript:void(0)">轮播图管理</a>
-		<div class="collapse in sidebar-block-children" id="side-bar-1">
-			<a href="/admin-carousel">定制轮播图</a>
+		<a class="sidebar-block-title" data-toggle="collapse" href="#side-bar-2">轮播图管理</a>
+		<div class="collapse in sidebar-block-children" id="side-bar-2">
+			<a href="/admin-carousel">定制轮播图模块</a>
 		</div>
 	</div>
 	<div class="side-block">
