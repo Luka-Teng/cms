@@ -40,6 +40,17 @@
 			'order' => 'ASC'
 		));
 	}
+	//pagination functions
+	function get_paginated_data ($table_name, $paged, $data_per_page) {
+		global $wpdb;
+		$passed_data = ($paged - 1) * $data_per_page;
+		return $wpdb->get_results( "SELECT * FROM " . $wpdb->prefix . $table_name . " LIMIT {$passed_data},{$data_per_page}", OBJECT );
+	}
+	function get_paginated_length ($table_name, $data_per_page) {
+		global $wpdb;
+		$result = $wpdb->get_results( "SELECT * FROM " . $wpdb->prefix . $table_name, OBJECT );
+		return ceil(count($result) / $data_per_page);
+	}
 ?>
 
 <?php
@@ -73,8 +84,12 @@
 		        time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		        company varchar(55) DEFAULT '' NOT NULL,
 		        name varchar(20) NOT NULL,
+				job varchar(20) NOT NULL,
+				phone varchar(20) NOT NULL,
 		        UNIQUE KEY id (id)
 		    ) $charset_collate;";
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		    dbDelta( $sql1 );
 	    }
 	    //创建轮播图数据库
 	    if ($wpdb->get_var('show tables like "' . CAROUSEL_TABLE . '"') != CAROUSEL_TABLE) {

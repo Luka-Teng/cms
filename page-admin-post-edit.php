@@ -15,12 +15,16 @@
 			<div class="form-item">
 				<p class="form-item-title">Category</p>
 				<select class="form-control" name="category" id="category">
-					<?php 
-						$categories = get_all_categories();
-						foreach ($categories as $cat) {
-							echo '<option value=' . $cat->term_id . '>' . $cat->name . '</option>';
-						}
-					?>
+					<?php $categories = get_all_categories(); ?>
+					<?php foreach ($categories as $cat) { ?>
+						<option value="<?php echo $cat->term_id ?>"
+							<?php 
+								if ($cat->term_id == $current_post->post_category[0]) {
+									echo "selected";
+								} 
+							?>
+						><?php echo $cat->name ?></option>
+					<?php } ?>				
 				</select>
 			</div>
 			<div class="form-divider"></div>
