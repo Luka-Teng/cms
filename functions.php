@@ -255,45 +255,71 @@
 		}
 		return new WP_error('file error', '请重新操作', array('status' => '505'));
 	}
-/*
-	//define excel api 
-	add_action( 'rest_api_init', 'excel_hook' );
-	function excel_hook() {
+
+	/******************************************************/
+	
+	//define excel api
+	
+	//define exporting method
+	function export_excel($table_name) {   
+	    global $wpdb;
+		$applicants = $wpdb->get_results( "SELECT * FROM " . $wpdb->prefix . $table_name, OBJECT );
+		$wpdb->show_errors();
+		if ($wpdb->last_error) {
+			return new WP_Error( 'database error', $wpdb->last_error, array('status' => '505') );
+		} else {
+			
+			//穿建缓存目录，和临时文件
+			$rand_num = mt_rand(1000000000000,9999999999999);
+			$dir_path = 'wp-content/themes/cms/tmp';
+			$file_path = 'wp-content/themes/cms/tmp/'."{$table_name}{$rand_num}.xls";
+			if (!file_exists($dir_path)) {
+				mkdir($dir_path, 0700);
+			}
+			
+			//写入文件
+			$file = fopen($file_path, 'w');
+			$result = "<table><thead><tr>";
+			foreach ($applicants[0] as $key => $value) {
+				$result .= "<td>{$key}</td>";
+			}
+			$result .= "</tr><thead><tbody>";
+			foreach ($applicants as $applicant) {
+				$result .= "<tr>";
+				foreach($applicant as $key => $value) {
+					$result .= "<td>{$value}</td>";
+				}
+				$result .= "</tr>";
+			}
+			$result .= "</tbody></table>";
+			fwrite($file, $result);
+			fclose($file);
+			
+			
+			return array(
+				'status' => '200',
+				'message' => 'success',
+				'url' => $file_path
+			);
+		}	
+	}
+	
+	//for media applicants
+	add_action( 'rest_api_init', 'media_excel_hook' );
+	function media_excel_hook() {
 		register_rest_route(
-			'apis', 'excel',
+			'apis', 'media_excel',
 			array(
 				'methods'  => 'GET',
-				'callback' => 'excel'
+				'callback' => 'media_excel',
+				'permission_callback' => function () {
+					return isAdministrator();
+				}
 			)
 		);
 	}
-	//excel method
-	function excel($request){
-		//输出的文件类型为excel    
-	    header("Content-type:application/vnd.ms-excel");    
-	    //提示下载    
-	    header("Content-Disposition:attachement;filename=Haoyunyun_".date("Ymd").".xls");    
-	    //报表数据    
-	    $ReportArr = array(array(1,2,3,4,5),    
-	                        array('A','B','C','D','E'),    
-	                        array('up','down','left','right','center'),    
-	                        array('欢','迎','光','临','郝云云','的','CSDN','博客')    
-	                    );    
-	    $ReportContent = '';    
-	    $num1 = count($ReportArr);    
-	    for($i=0;$i<$num1;$i++){    
-	        $num2 = count($ReportArr[$i]);    
-	        for($j=0;$j<$num2;$j++){    
-	            //ecxel都是一格一格的，用\t将每一行的数据连接起来    
-	            $ReportContent .= $ReportArr[$i][$j]."\t";    
-	        }    
-	        //最后连接\n 表示换行    
-	        $ReportContent .= "\n";    
-	    }    
-	    //用的utf-8 最后转换一个编码为gb    
-	    $ReportContent = mb_convert_encoding($ReportContent,"gb2312","utf-8");    
-	    //输出即提示下载    
-	    echo $ReportContent;    
-		}
-		*/
+	
+	function media_excel($request){
+		return export_excel("media_applicant");
+	}
 ?>

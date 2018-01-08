@@ -15,6 +15,9 @@
 		</div>
 	</div>
 	<div class="side-block">
-		<a class="sidebar-block-title" href="javascript:void(0)">用户申请</a>
+		<a class="sidebar-block-title" data-toggle="collapse" href="#side-bar-3">申请人信息</a>
+		<div class="collapse in sidebar-block-children" id="side-bar-3">
+			<a href="/admin-media-applicant">媒体申请人信息</a>
+		</div>
 	</div>				
 </div>

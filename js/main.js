@@ -265,6 +265,30 @@ jQuery(document).ready(function($) {
 			}
 		})
 	})
+	
+	//export excel for media applicants	
+	$(function () {
+		$('#export-media-excel').click(function () {
+			showLoading ()
+			var url = magicalData.siteURL + '/wp-json/apis/media_excel'
+			$.ajax({
+				type: 'get',
+				url: url,
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
+				},
+				success: function (data) {
+					refreshLoading ()
+					console.log(data)
+					window.location = window.location.origin + '/' + data.url
+				},
+				error: function () {
+					refreshLoading ()
+				    showflash(data.responseJSON.message, 'error')
+				}
+			})
+		})
+	})
 
 	//login
 	$(function () {
