@@ -14,6 +14,7 @@
 		), 1.0, true);
 		wp_enqueue_script('bootstrap_js', get_template_directory_uri() . '/js/bootstrap.min.js');
 		wp_enqueue_script('validate_js', get_template_directory_uri() . '/js/validate.js');
+		wp_enqueue_script('echarts', 'https://cdnjs.cloudflare.com/ajax/libs/echarts/3.8.5/echarts-en.common.min.js');
 		wp_localize_script('main_js', 'magicalData', array(
 			'nonce' => wp_create_nonce('wp_rest'),
 			'siteURL' => get_site_url()
@@ -270,6 +271,9 @@
 		} else {
 			
 			//穿建缓存目录，和临时文件
+			//临时文件需要linux进行定时任务进行删除
+			//crontab -e
+			//0 0 * * * rm -f path/* 每天0点准时删除
 			$rand_num = mt_rand(1000000000000,9999999999999);
 			$dir_path = 'wp-content/themes/cms/tmp';
 			$file_path = 'wp-content/themes/cms/tmp/'."{$table_name}{$rand_num}.xls";
