@@ -26,7 +26,7 @@
 <?php 
 	//some helper functions
 	function equal_and_set_values ($origin, $target, $true_value, $false_value) {
-		if ( $origin == $target) {
+		if ( $origin === $target) {
 			return $true_value;
 		}
 		return $false_value;
@@ -52,6 +52,51 @@
 		$result = $wpdb->get_results( "SELECT * FROM " . $wpdb->prefix . $table_name, OBJECT );
 		return ceil(count($result) / $data_per_page);
 	}
+	//send email
+	function sendEmail($host, $from_name, $from_email, $from_password, $to_email, $subject, $content) {
+		// 引入PHPMailer的核心文件
+		require_once("utils/phpMailer/PHPMailer.php");
+		require_once("utils/phpMailer/SMTP.php"); 
+		// 实例化PHPMailer核心类
+		$mail = new PHPMailer\PHPMailer\PHPMailer();
+		// 是否启用smtp的debug进行调试 开发环境建议开启 生产环境注释掉即可 默认关闭debug调试模式
+		$mail->SMTPDebug = 0;
+		// 使用smtp鉴权方式发送邮件
+		$mail->isSMTP();
+		// smtp需要鉴权 这个必须是true
+		$mail->SMTPAuth = true;
+		// 链接qq域名邮箱的服务器地址
+		$mail->Host = $host;
+		// 设置使用ssl加密方式登录鉴权
+		$mail->SMTPSecure = 'ssl';
+		// 设置ssl连接smtp服务器的远程服务器端口号
+		$mail->Port = 465;
+		// 设置发送的邮件的编码
+		$mail->CharSet = 'UTF-8';
+		// 设置发件人昵称 显示在收件人邮件的发件人邮箱地址前的发件人姓名
+		$mail->FromName = $from_name;
+		// smtp登录的账号 QQ邮箱即可
+		$mail->Username = $from_email;
+		// smtp登录的密码 使用生成的授权码
+		$mail->Password = $from_password;
+		// 设置发件人邮箱地址 同登录账号
+		$mail->From = $from_email;
+		// 邮件正文是否为html编码 注意此处是一个方法
+		$mail->isHTML(true);
+		// 设置收件人邮箱地址
+		$mail->addAddress($to_email);
+		// 添加多个收件人 则多次调用方法即可
+		#$mail->addAddress('87654321@163.com');
+		// 添加该邮件的主题
+		$mail->Subject = $subject;
+		// 添加邮件正文
+		$mail->Body = $content;
+		// 为该邮件添加附件
+		#$mail->addAttachment('');
+		// 发送邮件 返回状态
+		$status = $mail->send();
+		return $status;
+	}
 ?>
 
 <?php
@@ -59,6 +104,7 @@
 	// 声明全局变量$wpdb 和 数据表名常量
 	global $wpdb;
 	define('CAROUSEL_TABLE', $wpdb->prefix . 'carousel');
+	define('EMAIL_VERIFICATION_TABLE', $wpdb->prefix . 'email_verification');
 	define('MEDIA_TABLE', $wpdb->prefix . 'media_applicant');
 	define('SHOW_TABLE', $wpdb->prefix . 'show_applicant');
 	define('AUDIENCE_TABLE', $wpdb->prefix . 'audience_applicant');
@@ -77,11 +123,26 @@
 	    }
 	    if (!empty( $wpdb->collate)) {
 	      $charset_collate .= " COLLATE {$wpdb->collate}";
-	    }	    
-	    //创建媒体登记数据库
-	    if ($wpdb->get_var('show tables like "' . MEDIA_TABLE . '"') != MEDIA_TABLE) {
-	    	$sql1 = "CREATE TABLE " . MEDIA_TABLE . " (
+	    }
+		//创建邮箱验证数据库
+		if ($wpdb->get_var('show tables like "' . EMAIL_VERIFICATION_TABLE . '"') !== EMAIL_VERIFICATION_TABLE) {
+	    	$sql1 = "CREATE TABLE " . EMAIL_VERIFICATION_TABLE . " (
 		        id mediumint(9) NOT NULL AUTO_INCREMENT,
+				email varchar(30) NOT NULL UNIQUE,
+				code varchar(6) NOT NULL,
+				time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+				is_applicant char(1) NOT NULL DEFAULT 0, 
+				UNIQUE KEY id (id)
+		    ) $charset_collate;";
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		    dbDelta( $sql1 );
+	    }
+	    //创建媒体登记数据库
+	    if ($wpdb->get_var('show tables like "' . MEDIA_TABLE . '"') !== MEDIA_TABLE) {
+	    	$sql2 = "CREATE TABLE " . MEDIA_TABLE . " (
+		        id mediumint(9) NOT NULL AUTO_INCREMENT,
+				uid varchar(50) NOT NULL UNIQUE,
+				email varchar(30) NOT NULL DEFAULT '' UNIQUE, 
 		        time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		        company varchar(55) DEFAULT '' NOT NULL,
 		        name varchar(20) NOT NULL,
@@ -90,10 +151,10 @@
 		        UNIQUE KEY id (id)
 		    ) $charset_collate;";
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-		    dbDelta( $sql1 );
+		    dbDelta( $sql2 );
 	    }
 	    //创建轮播图数据库
-	    if ($wpdb->get_var('show tables like "' . CAROUSEL_TABLE . '"') != CAROUSEL_TABLE) {
+	    if ($wpdb->get_var('show tables like "' . CAROUSEL_TABLE . '"') !== CAROUSEL_TABLE) {
 	    	$sql3_1 = "CREATE TABLE " . CAROUSEL_TABLE . " (
 		        id mediumint(9) NOT NULL AUTO_INCREMENT,
 		        time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -179,8 +240,8 @@
 	//--specific carousel_upload method
 	//--have to set the auth in linux: sudo chmod -R 777 myResources
 	function carousel_upload_func($name) {
-		if ((($_FILES[$name]["type"] == "image/gif") || ($_FILES[$name]["type"] == "image/jpeg")
-			|| ($_FILES[$name]["type"] == "image/jpg") || ($_FILES[$name]["type"] == "image/pjpeg") || ($_FILES[$name]["type"] == "image/png"))
+		if ((($_FILES[$name]["type"] === "image/gif") || ($_FILES[$name]["type"] === "image/jpeg")
+			|| ($_FILES[$name]["type"] === "image/jpg") || ($_FILES[$name]["type"] === "image/pjpeg") || ($_FILES[$name]["type"] === "image/png"))
 			&& ($_FILES[$name]["size"] < 1000000)) {
 			if ($_FILES[$name]["error"] > 0) {
 				return new WP_Error( 'file error', $_FILES[$name]["error"], array(status => '505') );
@@ -255,6 +316,198 @@
 			}
 		}
 		return new WP_error('file error', '请重新操作', array('status' => '505'));
+	}
+	
+	/******************************************************/
+	
+	//define applicants api
+	
+	//create a order num
+	function getOrderNo($prefix) {
+		//订单号码主体（YYYYMMDDHHIISSNNNNNNNNN）
+		$order_id_main = date('YmdHis') . rand(100000000,999999999);
+		//订单号码主体长度
+		$order_id_len = strlen($order_id_main);
+		$order_id_sum = 0;
+		for($i=0; $i<$order_id_len; $i++){
+			$order_id_sum += (int)(substr($order_id_main,$i,1));
+		}
+		$order_id = $order_id_main . str_pad((100 - $order_id_sum % 100) % 100,2,'0',STR_PAD_LEFT);
+		return $prefix ? $prefix . $order_id : $order_id;
+	}
+	
+	//create an email code
+	function getSixCode() {
+		return rand(100000,999999);
+	}
+	
+	
+	//define validations
+	//是否是邮箱
+	function isEmail($value) {
+		$pattern = "/^([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)$/i";
+		if ( preg_match( $pattern, $value ) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	//是否是电话
+	function isPhone($value) {
+		$pattern = "/^1[0-9]{10}$/i";
+		if ( preg_match( $pattern, $value ) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	//更新或插入邮箱验证码
+	function setEmailCode($email) {
+		global $wpdb;
+		$code = getSixCode();
+		$columns["email"] = $email;
+		$columns["code"] = $code;
+		$result1 = $wpdb->get_row( "SELECT * FROM " . EMAIL_VERIFICATION_TABLE . " WHERE email = '{$email}' ", OBJECT );
+		if ($result1 !== null) {
+			//判断此邮箱是否已注册用户
+			if ($result1->is_applicant === 1) {
+				return new WP_Error( 'email used', '该邮箱已经注册过', array('status' => '505') ); 
+			}
+			$result2 = $wpdb->update( 
+				EMAIL_VERIFICATION_TABLE, 
+				$columns,
+				array("email" => $email)
+			);
+		} else {
+			$result2 = $wpdb->insert( 
+				EMAIL_VERIFICATION_TABLE, 
+				$columns
+			);
+		}
+		//如果任意一个数据库出错， 返回数据库错误，否则返回code
+		if ($result1 === false || $result2 === false) {
+			return new WP_Error( 'database error', $wpdb->last_error, array('status' => '505') );
+		} else {
+			return $code;
+		}
+	}
+	
+	//验证邮箱和验证码的匹配
+	function checkout_email_code($email, $email_code) {
+		global $wpdb;
+		$result = $wpdb->get_row( "SELECT * FROM " . EMAIL_VERIFICATION_TABLE . " WHERE email = '{$email}' ", OBJECT );
+		if (!$result || $result->is_applicant === '1' || $result->code !== $email_code) {
+			return false;
+		}
+		return true;
+	}
+	
+	//创建邮箱验证码的接口
+	add_action( 'rest_api_init', 'email_code_hook' );
+	function email_code_hook() {
+		register_rest_route(
+			'apis', 'email_code',
+			array(
+				'methods'  => 'POST',
+				'callback' => 'email_code',
+				'args' => array(
+				  'email' => array(
+					'validate_callback' => function ($param) {
+						return isEmail($param);
+					}
+				  )
+				)
+			)
+		);
+	}
+	function email_code($request) {
+		$result =  setEmailCode($request["email"]);
+		if (is_wp_error($result)) {
+			return $result;
+		}
+		$result = sendEmail("smtp.qq.com", 
+			"no-reply", 
+			"359593891@qq.com", 
+			"bmmytyvhsqxkbigd", 
+			"{$request["email"]}", 
+			"no-reply", 
+			"
+			<h1>请保管好验证码，切勿泄露<h1>
+			<h5>验证码: ${result}</h5>
+			");
+		if ($result) {
+			return array(
+				'status' => '200',
+				'message' => 'success'
+			); 
+		} else {
+			return new WP_Error( 'email sent error', '邮件无法发送', array('status' => '505') );
+		}
+	}
+	
+	//create a media applicant
+	add_action( 'rest_api_init', 'media_applicant_hook' );
+	function media_applicant_hook() {
+		register_rest_route(
+			'apis', 'media_applicant',
+			array(
+				'methods'  => 'POST',
+				'callback' => 'media_applicant',
+				'args' => array(
+				  'email' => array(
+					'validate_callback' => function ($param) {
+						return isEmail($param);
+					}
+				  ),
+				  'phone' => array(
+					'validate_callback' => function ($param) {
+						return isPhone($param);
+					}
+				  )
+				)
+			)
+		);
+	}
+	
+	function media_applicant($request){
+		//检查验证码是否正确
+		$result = checkout_email_code($request["email"], $request["email_code"]);
+		if ($result) {
+			//检验成功，插入数据，并修改EMAIL_VERIFICATION_TABLE对应的值
+			$columns["uid"] = getOrderNo("ma");
+			$columns["email"] = $request["email"];
+			$columns["name"] = $request["name"];
+			$columns["company"] = $request["company"];
+			$columns["job"] = $request["job"];
+			$columns["phone"] = $request["phone"];	
+			global $wpdb;	
+			//开启事务,插入新用户，并且修改验证码状态
+			$wpdb->query('START TRANSACTION');
+			$ts1 = $wpdb->update( 
+				EMAIL_VERIFICATION_TABLE, 
+				array("is_applicant" => "1"),
+				array("email" => $request["email"])
+			);
+			$ts2 = $wpdb->insert( 
+				MEDIA_TABLE, 
+				$columns
+			);
+			if ($ts1 && $ts2) {
+				$wpdb->query('COMMIT');
+				return array(
+					'status' => '200',
+					'message' => 'success'
+				);
+			} else {
+				$wpdb->query('ROLLBACK');
+				return new WP_Error( 'database error', '数据库出错', array('status' => '505') );
+			}
+		} else {
+			//验证失败
+			return new WP_Error( 'error', '验证失败，或者用户已注册', array('status' => '505') );
+		}
+		
 	}
 
 	/******************************************************/

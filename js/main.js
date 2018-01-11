@@ -321,4 +321,59 @@ jQuery(document).ready(function($) {
 		})
 	})
 	
+	//申请人相关
+	//发送验证码
+	$(function () {
+		$("#getcode-btn").click(function () {
+			showLoading ()
+			var url = magicalData.siteURL + '/wp-json/apis/email_code'
+			var email = $("#email").val()
+			$.ajax({
+				type: 'post',
+				url: url,
+				data: {
+					email: email
+				},
+			    success: function (data) {
+					refreshLoading ()
+			    	console.log(data)
+					showflash('已发送，请查收', 'success')
+			    },
+			    error: function (data) {
+					refreshLoading ()
+			    	showError(data.responseJSON.message)
+					showflash('发送失败', 'error')
+			    }
+			})
+		})
+	})
+	//创建媒体申请人
+	$(function () {
+		$("#create_media_applicant").click(function () {
+			showLoading ()
+			var url = magicalData.siteURL + '/wp-json/apis/media_applicant'
+			$.ajax({
+				type: 'post',
+				url: url,
+				data: {
+					email: $("#email").val(),
+					email_code: $("#email_code").val(),
+					name: $("#name").val(),
+					compant: $("#company").val(),
+					job: $("#job").val(),
+					phone: $("#phone").val()
+				},
+			    success: function (data) {
+					refreshLoading ()
+			    	console.log(data)
+					showflash('创建成功', 'success')
+			    },
+			    error: function (data) {
+					refreshLoading ()
+			    	showError(data.responseJSON.message)
+					showflash('创建失败', 'error')
+			    }
+			})
+		})
+	})
 })

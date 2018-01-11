@@ -11,6 +11,7 @@
 			<thead>
 				<tr>
 					<th>名字</th>
+					<th>邮箱</th>
 					<th>公司</th>
 					<th>职位</th>
 					<th>电话</th>
@@ -21,6 +22,7 @@
 				<?php foreach ($result as $applicant) { ?>
 					<tr>
 						<td><?php echo $applicant->name ?></td>
+						<td><?php echo $applicant->email ?></td>
 						<td><?php echo $applicant->company ?></td>
 						<td><?php echo $applicant->job ?></td>
 						<td><?php echo $applicant->phone ?></td>
