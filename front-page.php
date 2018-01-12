@@ -1,6 +1,9 @@
 <?php get_header(); ?>
 <?php
 	strtotime(date("2018-1-10 16:16:11")) - strtotime(date("2018-1-10 16:15:11"));
+	$result1 = $wpdb->get_row( "SELECT * FROM " . EMAIL_VERIFICATION_TABLE . " WHERE email = '359593891@qq.com' ", OBJECT );
+	echo json_encode($result1 -> is_applicant);
+	echo generateBarcode("ma2018011213124318385314929");
 ?>
 <div style="padding:30px;marign:10px auto">
 	<div class="form-group">
