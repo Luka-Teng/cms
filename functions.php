@@ -100,6 +100,12 @@
 		$status = $mail->send();
 		return $status;
 	}
+	//生成条形码
+	function generateBarcode($code) {
+		require_once("utils/phpBarcodeGenerator/BarcodeGeneratorJPG.php");
+		$generatorJPG = new Picqer\Barcode\BarcodeGeneratorJPG();
+		return '<img src="data:image/png;base64,' . base64_encode($generatorJPG->getBarcode($code, $generatorJPG::TYPE_CODE_128)) . '">';
+	}
 ?>
 
 <?php
