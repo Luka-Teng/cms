@@ -38,5 +38,8 @@
 				<a href="<?php echo wp_logout_url("/") ?>" class='log' >注销</a>
 			<?php endif ?>		
 		</header><!-- /site-header -->
+		<!--common tools-->
 		<?php get_template_part('common/loading', '') ?>
 		<?php get_template_part('common/error', '') ?>
+		<?php get_template_part('common/flash', '') ?>
+		<!--common tools-->
