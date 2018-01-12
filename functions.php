@@ -504,10 +504,26 @@
 			);
 			if ($ts1 && $ts2) {
 				$wpdb->query('COMMIT');
-				return array(
-					'status' => '200',
-					'message' => 'success'
-				);
+				$code_html = generateBarcode($columns["uid"]);
+				$result = sendEmail("smtp.qq.com", 
+					"no-reply", 
+					"359593891@qq.com", 
+					"bmmytyvhsqxkbigd", 
+					"{$request["email"]}", 
+					"no-reply", 
+					"
+					<h1>这是您入场用的条形码。<h1>
+					<h5>请妥善保管。</h5>
+					<div>{$code_html}</div>
+					");
+				if ($result) {
+					return array(
+						'status' => '200',
+						'message' => 'success'
+					); 
+				} else {
+					return new WP_Error( 'email sent error', '用户已创建，但邮件无法发送，请后台处理', array('status' => '505') );
+				}
 			} else {
 				$wpdb->query('ROLLBACK');
 				return new WP_Error( 'database error', '数据库出错', array('status' => '505') );
