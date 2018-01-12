@@ -374,7 +374,7 @@
 		$result1 = $wpdb->get_row( "SELECT * FROM " . EMAIL_VERIFICATION_TABLE . " WHERE email = '{$email}' ", OBJECT );
 		if ($result1 !== null) {
 			//判断此邮箱是否已注册用户
-			if ($result1->is_applicant === 1) {
+			if ($result1->is_applicant === '1') {
 				return new WP_Error( 'email used', '该邮箱已经注册过', array('status' => '505') ); 
 			}
 			$result2 = $wpdb->update( 
