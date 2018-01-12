@@ -53,12 +53,15 @@
 		return ceil(count($result) / $data_per_page);
 	}
 	//send email
+	use PHPMailer\PHPMailer\PHPMailer;
+	use PHPMailer\PHPMailer\Exception;
 	function sendEmail($host, $from_name, $from_email, $from_password, $to_email, $subject, $content) {
 		// 引入PHPMailer的核心文件
 		require_once("utils/phpMailer/PHPMailer.php");
-		require_once("utils/phpMailer/SMTP.php"); 
+		require_once("utils/phpMailer/SMTP.php");
+		require_once('utils/phpMailer/Exception.php');	
 		// 实例化PHPMailer核心类
-		$mail = new PHPMailer\PHPMailer\PHPMailer();
+		$mail = new PHPMailer();
 		// 是否启用smtp的debug进行调试 开发环境建议开启 生产环境注释掉即可 默认关闭debug调试模式
 		$mail->SMTPDebug = 0;
 		// 使用smtp鉴权方式发送邮件
