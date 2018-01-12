@@ -359,7 +359,7 @@ jQuery(document).ready(function($) {
 					email: $("#email").val(),
 					email_code: $("#email_code").val(),
 					name: $("#name").val(),
-					compant: $("#company").val(),
+					company: $("#company").val(),
 					job: $("#job").val(),
 					phone: $("#phone").val()
 				},
