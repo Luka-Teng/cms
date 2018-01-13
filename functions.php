@@ -104,7 +104,7 @@
 	function generateBarcode($code) {
 		require_once("utils/phpBarcodeGenerator/BarcodeGeneratorJPG.php");
 		$generatorJPG = new Picqer\Barcode\BarcodeGeneratorJPG();
-		return '<img style="display:inline-block;height:60px" src="data:image/png;base64,' . base64_encode($generatorJPG->getBarcode($code, $generatorJPG::TYPE_CODE_128)) . '">';
+		return '<img style="display:inline-block;height:60px" src="data:image/png;base64,' . base64_encode($generatorJPG->getBarcode($code, $generatorJPG::TYPE_CODE_128, 1)) . '">';
 	}
 ?>
 
