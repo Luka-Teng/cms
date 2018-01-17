@@ -42,7 +42,7 @@
 			$request->setBizContent("{'trade_no':'{$arr['trade_no']}','out_trade_no':'{$arr['out_trade_no']}'}");
 				
 			//请求  
-			$result = $this->c->execute ( $request);
+			$result = $this->c->execute ($request);
 			
 			//返回		
 			$responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
@@ -56,7 +56,7 @@
 		
 		#进行验证
 		function check($arr) {
-			$result = $this->c->rsaCheckV1($arr, $alipayConfig['alipayrsaPublicKey'], $alipayConfig['signType']);
+			$result = $this->c->rsaCheckV1($arr, $this->c->alipayrsaPublicKey, $this->c->charset, $this->c->signType);
 			return $result;
 		}
 	

@@ -367,7 +367,6 @@ jQuery(document).ready(function($) {
 					total_amount: '200.00'
 				},
 			    success: function (data) {
-					refreshLoading ()
 			    	console.log(data)
 					$("body").append(data)
 					showflash('创建成功', 'success')
