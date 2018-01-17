@@ -1,3 +1,4 @@
 upload/
 tmp/
-mylogs.txt
+httpLogs.txt
+myLogs.txt

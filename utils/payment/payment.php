@@ -53,6 +53,12 @@
 				return "no trade info";
 			}
 		}
+		
+		#进行验证
+		function check($arr) {
+			$result = $this->c->rsaCheckV1($arr, $this->c->alipayrsaPublicKey, $this->c->signType);
+			return $result;
+		}
 	
 	}
 ?>

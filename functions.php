@@ -545,7 +545,7 @@
 					#返回支付订单页
 					$result = $alipay->payRequest(Array(
 						'returnUrl' => 'https://zhidao.baidu.com/question/146272957.html',
-						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/alipay_notifyUrl/?uid=' . $columns["uid"],
+						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/alipay_notifyUrl',
 						'out_trade_no' => $columns["uid"],
 						'subject' => '支付宝测试请求',
 						'total_amount' => $request["total_amount"],
@@ -597,7 +597,12 @@
 		);
 	}
 	function alipay_notifyUrl($request){
-		return "success";
+		require_once("utils/payment/payment.php");
+		$arr = $_POST;
+		#创建aop实例
+		$alipay = new Alipayment();
+		$result = $alipay->check($arr);
+		write_log_file("the status is " . $result);
 	}
 	
 	/******************************************************/
@@ -672,10 +677,11 @@
 ?>
 
 <?php
-	make_log_file();
-	function make_log_file(){
+	//记录HTTP log
+	make_httpLog_file();
+	function make_httpLog_file(){
 		//log文件名
-		$filename = 'mylogs.txt';
+		$filename = 'httpLogs.txt';
 		$word = '';
 		//去除rc-ajax评论以及cron机制访问记录
 		if(strstr($_SERVER["REQUEST_URI"],"rc-ajax")== false
@@ -697,5 +703,16 @@
 			fwrite($fh, $word);
 			fclose($fh);
 		}
+	}
+	
+	//自定义log
+	function write_log_file($msg){
+		//log文件名
+		$filename = 'myLogs.txt';
+		$word = $msg;
+		$word .= "\n";
+		$fh = fopen('wp-content/themes/cms/'.$filename, "a");
+		fwrite($fh, $word);
+		fclose($fh);
 	}
 ?>
