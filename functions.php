@@ -545,7 +545,7 @@
 					#返回支付订单页
 					$result = $alipay->payRequest(Array(
 						'returnUrl' => 'https://zhidao.baidu.com/question/146272957.html',
-						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/alipay_notifyUrl',
+						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl',
 						'out_trade_no' => $columns["uid"],
 						'subject' => '支付宝测试请求',
 						'total_amount' => $request["total_amount"],
@@ -597,7 +597,12 @@
 		);
 	}
 	function alipay_notifyUrl($request){
-		write_log_file("the status is ");
+		require_once("utils/payment/payment.php");
+		$arr = $_POST;
+		#创建aop实例
+		$alipay = new Alipayment();
+		$result = $alipay->check($arr);
+		write_log_file("the status is " . $result);
 	}
 	
 	/******************************************************/
