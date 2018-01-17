@@ -56,7 +56,7 @@
 		
 		#进行验证
 		function check($arr) {
-			$result = $this->c->rsaCheckV1($arr, $this->c->alipayrsaPublicKey, $this->c->signType);
+			$result = $this->c->rsaCheckV1($arr, $alipayConfig['alipayrsaPublicKey'], $alipayConfig['signType']);
 			return $result;
 		}
 	

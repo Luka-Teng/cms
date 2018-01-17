@@ -602,7 +602,7 @@
 		#创建aop实例
 		$alipay = new Alipayment();
 		$result = $alipay->check($arr);
-		write_log_file("the status is " . $result);
+		write_log_file("the status is " . true);
 	}
 	
 	/******************************************************/
