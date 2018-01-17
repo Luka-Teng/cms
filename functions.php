@@ -545,7 +545,7 @@
 					#返回支付订单页
 					$result = $alipay->payRequest(Array(
 						'returnUrl' => 'https://zhidao.baidu.com/question/146272957.html',
-						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . 'alipay_notifyUrl/?uid=' . $columns["uid"],
+						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/alipay_notifyUrl/?uid=' . $columns["uid"],
 						'out_trade_no' => $columns["uid"],
 						'subject' => '支付宝测试请求',
 						'total_amount' => $request["total_amount"],
