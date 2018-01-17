@@ -573,7 +573,6 @@
 				}
 				*/
 			} else {
-				$wpdb->query('ROLLBACK');
 				return new WP_Error( 'database error', '数据库出错,该邮箱可能已注册', array('status' => '505') );
 			}
 		} else {
@@ -602,7 +601,7 @@
 		#创建aop实例
 		$alipay = new Alipayment();
 		$result = $alipay->check($arr);
-		write_log_file("the status is " . true);
+		write_log_file("the status is " . $result);
 	}
 	
 	/******************************************************/
