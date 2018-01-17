@@ -114,8 +114,7 @@
 	global $wpdb;
 	define('CAROUSEL_TABLE', $wpdb->prefix . 'carousel');
 	define('EMAIL_VERIFICATION_TABLE', $wpdb->prefix . 'email_verification');
-	define('MEDIA_TABLE', $wpdb->prefix . 'media_applicant');
-	define('SHOW_TABLE', $wpdb->prefix . 'show_applicant');
+	define('APPLICANT_TABLE', $wpdb->prefix . 'applicant');
 	define('AUDIENCE_TABLE', $wpdb->prefix . 'audience_applicant');
 	// 插件激活时，运行回调方法创建数据表, 在WP原有的options表中插入插件版本号
 	add_action('after_switch_theme', 'initdb');
@@ -140,15 +139,14 @@
 				email varchar(30) NOT NULL UNIQUE,
 				code varchar(6) NOT NULL,
 				time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				is_applicant char(1) NOT NULL DEFAULT 0, 
 				UNIQUE KEY id (id)
 		    ) $charset_collate;";
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		    dbDelta( $sql1 );
 	    }
-	    //创建媒体登记数据库
-	    if ($wpdb->get_var('show tables like "' . MEDIA_TABLE . '"') !== MEDIA_TABLE) {
-	    	$sql2 = "CREATE TABLE " . MEDIA_TABLE . " (
+	    //创建申请人登记数据库
+	    if ($wpdb->get_var('show tables like "' . APPLICANT_TABLE . '"') !== APPLICANT_TABLE) {
+	    	$sql2 = "CREATE TABLE " . APPLICANT_TABLE . " (
 		        id mediumint(9) NOT NULL AUTO_INCREMENT,
 				uid varchar(50) NOT NULL UNIQUE,
 				email varchar(30) NOT NULL DEFAULT '' UNIQUE, 
@@ -157,6 +155,9 @@
 		        name varchar(20) NOT NULL,
 				job varchar(20) NOT NULL,
 				phone varchar(20) NOT NULL,
+				type varchar(20) NOT NULL,
+				payment_status varchar(20) NOT NULL DEFAULT 'unpaid',
+				total_amount varchar(20) NOT NULL DEFAULT '0',
 		        UNIQUE KEY id (id)
 		    ) $charset_collate;";
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -370,6 +371,22 @@
 			return false;
 		}
 	}
+	//是否不为空
+	function isNotNull($value) {
+		if ( empty($value) ) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	//值是否在数组之中
+	function isInArray($value, $arr) {
+		if (in_array($value, $arr)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	//更新或插入邮箱验证码
 	function setEmailCode($email) {
@@ -379,10 +396,6 @@
 		$columns["code"] = $code;
 		$result1 = $wpdb->get_row( "SELECT * FROM " . EMAIL_VERIFICATION_TABLE . " WHERE email = '{$email}' ", OBJECT );
 		if ($result1 !== null) {
-			//判断此邮箱是否已注册用户
-			if ($result1->is_applicant === '1') {
-				return new WP_Error( 'email used', '该邮箱已经注册过', array('status' => '505') ); 
-			}
 			$result2 = $wpdb->update( 
 				EMAIL_VERIFICATION_TABLE, 
 				$columns,
@@ -406,7 +419,7 @@
 	function checkout_email_code($email, $email_code) {
 		global $wpdb;
 		$result = $wpdb->get_row( "SELECT * FROM " . EMAIL_VERIFICATION_TABLE . " WHERE email = '{$email}' ", OBJECT );
-		if (!$result || $result->is_applicant === '1' || $result->code !== $email_code) {
+		if (!$result || $result->code !== $email_code) {
 			return false;
 		}
 		return true;
@@ -456,13 +469,13 @@
 	}
 	
 	//create a media applicant
-	add_action( 'rest_api_init', 'media_applicant_hook' );
-	function media_applicant_hook() {
+	add_action( 'rest_api_init', 'create_applicant_hook' );
+	function create_applicant_hook() {
 		register_rest_route(
-			'apis', 'media_applicant',
+			'apis', 'create_applicant',
 			array(
 				'methods'  => 'POST',
-				'callback' => 'media_applicant',
+				'callback' => 'create_applicant',
 				'args' => array(
 				  'email' => array(
 					'validate_callback' => function ($param) {
@@ -473,13 +486,38 @@
 					'validate_callback' => function ($param) {
 						return isPhone($param);
 					}
+				  ),
+				  'name' => array(
+					'validate_callback' => function ($param) {
+						return isNotNull($param);
+					}
+				  ),
+				  'company' => array(
+					'validate_callback' => function ($param) {
+						return isNotNull($param);
+					}
+				  ),
+				  'job' => array(
+					'validate_callback' => function ($param) {
+						return isNotNull($param);
+					}
+				  ),
+				  'type' => array(
+					'validate_callback' => function ($param) {
+						return isInArray($param, ['audience', 'media']);
+					}
+				  ),
+				  'payment_type' => array(
+					'validate_callback' => function ($param) {
+						return isInArray($param, ['alipay', 'wechat']);
+					}
 				  )
 				)
 			)
 		);
 	}
 	
-	function media_applicant($request){
+	function create_applicant($request){
 		//检查验证码是否正确
 		$result = checkout_email_code($request["email"], $request["email_code"]);
 		if ($result) {
@@ -489,21 +527,34 @@
 			$columns["name"] = $request["name"];
 			$columns["company"] = $request["company"];
 			$columns["job"] = $request["job"];
-			$columns["phone"] = $request["phone"];	
+			$columns["phone"] = $request["phone"];
+			$columns["type"] = $request["type"];			
 			global $wpdb;	
-			//开启事务,插入新用户，并且修改验证码状态
-			$wpdb->query('START TRANSACTION');
-			$ts1 = $wpdb->update( 
-				EMAIL_VERIFICATION_TABLE, 
-				array("is_applicant" => "1"),
-				array("email" => $request["email"])
-			);
-			$ts2 = $wpdb->insert( 
-				MEDIA_TABLE, 
+			//插入新用户，状态为unpaid			
+			$ts1 = $wpdb->insert( 
+				APPLICANT_TABLE, 
 				$columns
 			);
-			if ($ts1 && $ts2) {
-				$wpdb->query('COMMIT');
+			if ($ts1) {
+				#发起支付请求
+				if ($request["payment_type"] === 'alipay') {
+					#支付宝请求
+					require_once("utils/payment/payment.php");						
+					#创建aop实例
+					$alipay = new Alipayment();					
+					#返回支付订单页
+					$result = $alipay->payRequest(Array(
+						'returnUrl' => 'https://zhidao.baidu.com/question/146272957.html',
+						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . 'alipay_notifyUrl/?uid=' . $columns["uid"],
+						'out_trade_no' => $columns["uid"],
+						'subject' => '支付宝测试请求',
+						'total_amount' => $request["total_amount"],
+						'body' => '支付宝测试请求'
+					));						
+					return $result;
+				}
+				
+				/*
 				$code_html = generateBarcode($columns["uid"]);
 				$result = sendEmail("smtp.qq.com", 
 					"no-reply", 
@@ -517,24 +568,38 @@
 					<div>{$code_html}</div>
 					");
 				if ($result) {
-					return array(
-						'status' => '200',
-						'message' => 'success'
-					); 
 				} else {
 					return new WP_Error( 'email sent error', '用户已创建，但邮件无法发送，请后台处理', array('status' => '505') );
 				}
+				*/
 			} else {
 				$wpdb->query('ROLLBACK');
-				return new WP_Error( 'database error', '数据库出错', array('status' => '505') );
+				return new WP_Error( 'database error', '数据库出错,该邮箱可能已注册', array('status' => '505') );
 			}
 		} else {
 			//验证失败
-			return new WP_Error( 'error', '验证失败，或者用户已注册', array('status' => '505') );
+			return new WP_Error( 'error', '验证失败', array('status' => '505') );
 		}
 		
 	}
-
+	
+	/******************************************************/
+	
+	//定义alipay的notifyUrl接口
+	add_action( 'rest_api_init', 'alipay_notifyUrl_hook' );
+	function alipay_notifyUrl_hook() {
+		register_rest_route(
+			'apis', 'alipay_notifyUrl',
+			array(
+				'methods'  => 'POST',
+				'callback' => 'alipay_notifyUrl'
+			)
+		);
+	}
+	function alipay_notifyUrl($request){
+		return "success";
+	}
+	
 	/******************************************************/
 	
 	//define excel api
@@ -603,5 +668,34 @@
 	
 	function media_excel($request){
 		return export_excel("media_applicant");
+	}
+?>
+
+<?php
+	make_log_file();
+	function make_log_file(){
+		//log文件名
+		$filename = 'mylogs.txt';
+		$word = '';
+		//去除rc-ajax评论以及cron机制访问记录
+		if(strstr($_SERVER["REQUEST_URI"],"rc-ajax")== false
+		&& strstr($_SERVER["REQUEST_URI"],"wp-cron.php")== false ) {
+			$word .= date('Y-m-d H:i:s',$_SERVER['REQUEST_TIME'] + 3600*8) . " ";
+			//访问页面
+			$word .= $_SERVER["REQUEST_URI"] ." ";
+			//协议
+			$word .= $_SERVER['SERVER_PROTOCOL'] ." ";
+			//方法,POST OR GET
+			$word .= $_SERVER['REQUEST_METHOD'] . "\n";
+			//传递参数
+			$word .= json_encode($_POST) . "\n";
+			//跳转地址
+			$word .= "FROM " . $_SERVER['HTTP_REFERER'] . "\n";
+
+			$word .= "\n";
+			$fh = fopen('wp-content/themes/cms/'.$filename, "a");
+			fwrite($fh, $word);
+			fclose($fh);
+		}
 	}
 ?>

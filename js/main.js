@@ -351,7 +351,7 @@ jQuery(document).ready(function($) {
 	$(function () {
 		$("#create_media_applicant").click(function () {
 			showLoading ()
-			var url = magicalData.siteURL + '/wp-json/apis/media_applicant'
+			var url = magicalData.siteURL + '/wp-json/apis/create_applicant'
 			$.ajax({
 				type: 'post',
 				url: url,
@@ -361,11 +361,15 @@ jQuery(document).ready(function($) {
 					name: $("#name").val(),
 					company: $("#company").val(),
 					job: $("#job").val(),
-					phone: $("#phone").val()
+					phone: $("#phone").val(),
+					type: 'media',
+					payment_type: 'alipay',
+					total_amount: '200.00'
 				},
 			    success: function (data) {
 					refreshLoading ()
 			    	console.log(data)
+					$("body").append(data)
 					showflash('创建成功', 'success')
 			    },
 			    error: function (data) {
