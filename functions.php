@@ -597,12 +597,7 @@
 		);
 	}
 	function alipay_notifyUrl($request){
-		require_once("utils/payment/payment.php");
-		$arr = $_POST;
-		#创建aop实例
-		$alipay = new Alipayment();
-		$result = $alipay->check($arr);
-		write_log_file("the status is " . $result);
+		write_log_file("the status is ");
 	}
 	
 	/******************************************************/
@@ -697,7 +692,6 @@
 			$word .= json_encode($_POST) . "\n";
 			//跳转地址
 			$word .= "FROM " . $_SERVER['HTTP_REFERER'] . "\n";
-
 			$word .= "\n";
 			$fh = fopen('wp-content/themes/cms/'.$filename, "a");
 			fwrite($fh, $word);
