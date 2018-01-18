@@ -599,7 +599,6 @@
 		require_once("utils/payment/alipay/AopSdk.php");
 		$str = '';
 		foreach ($_POST as $key => $value) {
-			if ($key === 'fund_bill_list')
 			$str .= $key . '=' . stripslashes($value);   . '&';
 		}
 		$aop = new AopClient;
