@@ -615,13 +615,14 @@
 		if ($flag) {
 			write_log_file("验签成功");
 			write_log_file($str);
-			return 'success';
+			write_log_file("支付宝验签结束-----------------");
+			echo 'success';
 		} else {
 			write_log_file("验签失败");
 			write_log_file($str);
-			return 'fail';
-		}
-		write_log_file("支付宝验签结束-----------------");
+			write_log_file("支付宝验签结束-----------------");
+			echo 'fail';
+		}		
 	}
 	
 	/******************************************************/
