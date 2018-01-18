@@ -607,10 +607,10 @@
 		write_log_file("lialialai");
 		if ($flag) {
 			write_log_file("ok");
-			write_log_file(str);
+			write_log_file($str);
 		} else {
 			write_log_file("not ok");
-			write_log_file(str);
+			write_log_file($str);
 		}
 	}
 	
