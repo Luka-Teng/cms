@@ -637,19 +637,19 @@
 				global $alipayConfig;
 				$applicant = $wpdb->get_row( "SELECT * FROM " . APPLICANT_TABLE . " WHERE uid = '{$_POST['out_trade_no']}' ", OBJECT );
 				if ($applicant) {
-					write_log_file("查到这个用户")
+					write_log_file("查到这个用户");
 				} else {
-					write_log_file("查不到这个用户")
+					write_log_file("查不到这个用户");
 				}
 				if ($applicant->total_amount === $_POST['total_amount']) {
-					write_log_file("金额对")
+					write_log_file("金额对");
 				} else {
-					write_log_file("金额不对")
+					write_log_file("金额不对");
 				}
 				if ($alipayConfig['appId'] === $_POST['app_id']) {
-					write_log_file("appid对")
+					write_log_file("appid对");
 				} else {
-					write_log_file("appid不对")
+					write_log_file("appid不对");
 				}
 				if ($applicant && $applicant->total_amount === $_POST['total_amount'] && $alipayConfig['appId'] === $_POST['app_id']) {
 					#实现业务逻辑
