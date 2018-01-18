@@ -1,4 +1,8 @@
 <?php get_header(); ?>
+<?php
+	require_once("utils/payment/config.php");
+	echo $alipayConfig['appId'];
+?>
 <div style="padding:30px;marign:10px auto">
 	<div class="form-group">
 		邮箱<input name="email" id="email" class="form-control">

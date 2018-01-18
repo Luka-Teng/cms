@@ -634,25 +634,7 @@
 				#判断是否存在该uid用户, 总金额是否正确，appid是否一致
 				require_once("utils/payment/config.php");
 				global $wpdb;
-				global $alipayConfig;
 				$applicant = $wpdb->get_row( "SELECT * FROM " . APPLICANT_TABLE . " WHERE uid = '{$_POST['out_trade_no']}' ", OBJECT );
-				if ($applicant) {
-					write_log_file("查到这个用户");
-				} else {
-					write_log_file("查不到这个用户");
-				}
-				if ($applicant->total_amount === $_POST['total_amount']) {
-					write_log_file("金额对");
-				} else {
-					write_log_file("金额不对");
-				}
-				if ($alipayConfig['appId'] === $_POST['app_id']) {
-					write_log_file("id in config : " . $alipayConfig['appId']);
-					write_log_file("id in params : " . $_POST['app_id']);
-				} else {
-					write_log_file("id in config : " . $alipayConfig['appId']);
-					write_log_file("id in params : " . $_POST['app_id']);
-				}
 				if ($applicant && $applicant->total_amount === $_POST['total_amount'] && $alipayConfig['appId'] === $_POST['app_id']) {
 					#实现业务逻辑
 					$query = $wpdb->insert( 
