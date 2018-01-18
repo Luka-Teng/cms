@@ -596,25 +596,32 @@
 		);
 	}
 	function alipay_notifyUrl($request){
-		require_once("utils/payment/alipay/AopSdk.php");
+		#支付宝请求
+		require_once("utils/payment/payment.php");						
+		#创建alipay实例
+		$alipay = new Alipayment();
+		#用于输出日志
 		$str = '';
+		#用于校验
 		$arr = [];
+		#用于返回校验结果
 		foreach ($_POST as $key => $value) {
 			$str .= $key . '=' . stripslashes($value) . '&';
 			$arr[$key] = stripslashes($value);		
 		}
 		$str = substr($str,0,strlen($str)-1);
-		$aop = new AopClient;
-		$aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv7PkFfpn7CRPVaHDtDz1FERp10hEMjjztYsfmiLLTRBGPAi6pIDTszwRSnkiB39osnwyaWeCJmGPMbp0qz6GgkqT/a+GTkbHnZA7vwykjfT8vA5i2EnqycfBem585o0dABZQfZEenIGGkxxcIK8gGe+d1tFnWjqR+T70uA/WrvoCtKDZ9oAWlPoUXCx9iPyunwPvFedurgMZZ3UiP3AE/avU0eAoWqYMrjXOZYELjdPLvwRRCn3n3Y9hzLejidCcXSwp0vkgtslL/t4w2hNOsidHHx/VGo6/OeTJeNGoqA3FtQMB8nPBUPnMMU5pf7XkulBCE1n0UbBaCLL3mvWsnQIDAQAB';
-		$flag = $aop->rsaCheckV1($arr, 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv7PkFfpn7CRPVaHDtDz1FERp10hEMjjztYsfmiLLTRBGPAi6pIDTszwRSnkiB39osnwyaWeCJmGPMbp0qz6GgkqT/a+GTkbHnZA7vwykjfT8vA5i2EnqycfBem585o0dABZQfZEenIGGkxxcIK8gGe+d1tFnWjqR+T70uA/WrvoCtKDZ9oAWlPoUXCx9iPyunwPvFedurgMZZ3UiP3AE/avU0eAoWqYMrjXOZYELjdPLvwRRCn3n3Y9hzLejidCcXSwp0vkgtslL/t4w2hNOsidHHx/VGo6/OeTJeNGoqA3FtQMB8nPBUPnMMU5pf7XkulBCE1n0UbBaCLL3mvWsnQIDAQAB', "RSA2");
-		write_log_file("lialialai");
+		$flag = $alipay($arr);
+		write_log_file("支付宝验签开始-----------------");
 		if ($flag) {
-			write_log_file("ok");
+			write_log_file("验签成功");
 			write_log_file($str);
+			return 'success'
 		} else {
-			write_log_file("not ok");
+			write_log_file("验签失败");
 			write_log_file($str);
+			return 'fail'
 		}
+		write_log_file("支付宝验签结束-----------------");
 	}
 	
 	/******************************************************/

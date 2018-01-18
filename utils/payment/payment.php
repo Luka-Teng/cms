@@ -56,9 +56,7 @@
 		
 		#进行验证
 		function check($arr) {
-			$aop = new AopClient;
-			$aop->alipayrsaPublicKey = $this->c->alipayrsaPublicKey;
-			$flag = $aop->rsaCheckV1($arr, NULL, "RSA2");
+			return $flag = $this->c->rsaCheckV1($arr, $this->c->alipayrsaPublicKey, $this->c->signType);
 		}
 	
 	}
