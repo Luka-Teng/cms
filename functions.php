@@ -616,6 +616,10 @@
 		#用于返回校验结果
 		foreach ($_POST as $key => $value) {
 			$str .= $key . '=' . stripslashes($value) . '&';
+			#自传参数不参加校验，自传参数目前只有from_email
+			if ($key === 'from_email') {
+				continue;
+			}
 			$arr[$key] = stripslashes($value);		
 		}
 		$str = substr($str,0,strlen($str)-1);
