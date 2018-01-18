@@ -1,7 +1,7 @@
 jQuery(document).ready(function($) {
 	//common tools handling
 	function showError (msg) {
-		msg ? msg = 'error' : ''
+		msg.responseJSON ? msg = msg.responseJSON.message : ''
 		$("#error")
 			.addClass("active")
 			.find('.error-content').html(msg)
@@ -18,7 +18,7 @@ jQuery(document).ready(function($) {
 		$("#loading").removeClass("active")
 	}
 	function showflash (msg, type) {
-		msg === '' ? msg = 'done!' : ''
+		msg.responseJSON ? msg = msg.responseJSON.message : ''
 		var colors = {
 			error: '#ed222e',
 			success: '#99cc00'
@@ -121,7 +121,7 @@ jQuery(document).ready(function($) {
 			    },
 			    error: function (data) {
 			    	refreshLoading ()
-			    	showError(data.responseJSON.message)
+			    	showError(data)
 			    }
 			})
 		})
@@ -164,7 +164,7 @@ jQuery(document).ready(function($) {
 			    },
 			    error: function (data) {
 			    	refreshLoading ()
-			    	showError(data.responseJSON.message)
+			    	showError(data)
 			    }
 			})
 		})
@@ -189,7 +189,7 @@ jQuery(document).ready(function($) {
 					},
 					error: function (data) {
 						refreshLoading ()
-						showError(data.responseJSON.message)
+						showError(data)
 					}
 				})
 			}			
@@ -223,7 +223,7 @@ jQuery(document).ready(function($) {
 			    },
 			    error: function (data) {
 			    	refreshLoading ()
-			    	showflash(data.responseJSON.message, 'error')
+			    	showflash(data, 'error')
 			    }
 			})
 		})
@@ -259,7 +259,7 @@ jQuery(document).ready(function($) {
 				    },
 				    error: function (data) {
 				    	refreshLoading ()
-				    	showflash(data.responseJSON.message, 'error')
+				    	showflash(data, 'error')
 				    }
 				})
 			}
@@ -284,7 +284,7 @@ jQuery(document).ready(function($) {
 				},
 				error: function () {
 					refreshLoading ()
-				    showflash(data.responseJSON.message, 'error')
+				    showflash(data, 'error')
 				}
 			})
 		})
@@ -341,7 +341,7 @@ jQuery(document).ready(function($) {
 			    },
 			    error: function (data) {
 					refreshLoading ()
-			    	showError(data.responseJSON.message)
+			    	showError(data)
 					showflash('发送失败', 'error')
 			    }
 			})
@@ -373,7 +373,7 @@ jQuery(document).ready(function($) {
 			    },
 			    error: function (data) {
 					refreshLoading ()
-			    	showError(data.responseJSON.message)
+			    	showError(data)
 					showflash('创建失败', 'error')
 			    }
 			})
