@@ -521,6 +521,7 @@
 	function create_applicant($request){
 		//检查验证码是否正确
 		$result = checkout_email_code($request["email"], $request["email_code"]);
+		$uid = getOrderNo("ma");
 		if ($result) {
 			#判断该邮箱是否注册，或者该注册邮箱是否unpaid
 			global $wpdb;
@@ -539,7 +540,7 @@
 					$result = $alipay->payRequest(Array(
 						'returnUrl' => 'https://zhidao.baidu.com/question/146272957.html',
 						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl/?from_email=' . $request["email"],
-						'out_trade_no' => $columns["uid"],
+						'out_trade_no' => $uid,
 						'subject' => '支付宝测试请求',
 						'total_amount' => $request["total_amount"],
 						'body' => '支付宝测试请求'
@@ -548,7 +549,7 @@
 				}
 			} else {
 				//如果用户未创建，创建用户，并发起请求
-				$columns["uid"] = getOrderNo("ma");
+				$columns["uid"] = $uid;
 				$columns["email"] = $request["email"];
 				$columns["name"] = $request["name"];
 				$columns["company"] = $request["company"];
