@@ -647,9 +647,11 @@
 					write_log_file("金额不对");
 				}
 				if ($alipayConfig['appId'] === $_POST['app_id']) {
-					write_log_file("appid对");
+					write_log_file("id in config : " . $alipayConfig['appId']);
+					write_log_file("id in params : " . $_POST['app_id']);
 				} else {
-					write_log_file("appid不对");
+					write_log_file("id in config : " . $alipayConfig['appId']);
+					write_log_file("id in params : " . $_POST['app_id']);
 				}
 				if ($applicant && $applicant->total_amount === $_POST['total_amount'] && $alipayConfig['appId'] === $_POST['app_id']) {
 					#实现业务逻辑
