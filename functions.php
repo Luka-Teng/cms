@@ -526,7 +526,7 @@
 			$applicant = $wpdb->get_row( "SELECT * FROM " . APPLICANT_TABLE . " WHERE email = '{$request["email"]}' ", OBJECT );
 			if ($applicant && $applicant->payment_status === 'paid') {
 				#如果用户已付款，直接输出错误
-				return return new WP_Error( 'error', '该账号已付款', array('status' => '505') );
+				return new WP_Error( 'error', '该账号已付款', array('status' => '505') );
 			} else if ($applicant && $applicant->payment_status === 'unpaid') {
 				#如果用户以创建，但是未付款，直接发起付款请求
 				if ($request["payment_type"] === 'alipay') {
