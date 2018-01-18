@@ -149,6 +149,7 @@
 	    	$sql2 = "CREATE TABLE " . APPLICANT_TABLE . " (
 		        id mediumint(9) NOT NULL AUTO_INCREMENT,
 				uid varchar(50) NOT NULL UNIQUE,
+				trade_no varchar(50) DEFAULT '' UNIQUE,
 				email varchar(30) NOT NULL DEFAULT '' UNIQUE, 
 		        time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		        company varchar(55) DEFAULT '' NOT NULL,
@@ -521,31 +522,22 @@
 		//检查验证码是否正确
 		$result = checkout_email_code($request["email"], $request["email_code"]);
 		if ($result) {
-			//检验成功，插入数据，并修改EMAIL_VERIFICATION_TABLE对应的值
-			$columns["uid"] = getOrderNo("ma");
-			$columns["email"] = $request["email"];
-			$columns["name"] = $request["name"];
-			$columns["company"] = $request["company"];
-			$columns["job"] = $request["job"];
-			$columns["phone"] = $request["phone"];
-			$columns["type"] = $request["type"];			
-			global $wpdb;	
-			//插入新用户，状态为unpaid			
-			$ts1 = $wpdb->insert( 
-				APPLICANT_TABLE, 
-				$columns
-			);
-			if ($ts1) {
-				#发起支付请求
+			#判断该邮箱是否注册，或者该注册邮箱是否unpaid
+			$applicant = $wpdb->get_row( "SELECT * FROM " . APPLICANT_TABLE . " WHERE email = '{$request["email"]}' ", OBJECT );
+			if ($applicant && $applicant->payment_status === 'paid') {
+				#如果用户已付款，直接输出错误
+				return return new WP_Error( 'error', '该账号已付款', array('status' => '505') );
+			} else if ($applicant && $applicant->payment_status === 'unpaid') {
+				#如果用户以创建，但是未付款，直接发起付款请求
 				if ($request["payment_type"] === 'alipay') {
 					#支付宝请求
 					require_once("utils/payment/payment.php");						
-					#创建aop实例
+					#创建alipay实例
 					$alipay = new Alipayment();					
 					#返回支付订单页
 					$result = $alipay->payRequest(Array(
 						'returnUrl' => 'https://zhidao.baidu.com/question/146272957.html',
-						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl',
+						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl/?from_email=' . $request["email"],
 						'out_trade_no' => $columns["uid"],
 						'subject' => '支付宝测试请求',
 						'total_amount' => $request["total_amount"],
@@ -553,27 +545,43 @@
 					));						
 					return $result;
 				}
-				
-				/*
-				$code_html = generateBarcode($columns["uid"]);
-				$result = sendEmail("smtp.qq.com", 
-					"no-reply", 
-					"359593891@qq.com", 
-					"bmmytyvhsqxkbigd", 
-					"{$request["email"]}", 
-					"no-reply", 
-					"
-					<h1>这是您入场用的条形码。<h1>
-					<h5>请妥善保管。</h5>
-					<div>{$code_html}</div>
-					");
-				if ($result) {
-				} else {
-					return new WP_Error( 'email sent error', '用户已创建，但邮件无法发送，请后台处理', array('status' => '505') );
-				}
-				*/
 			} else {
-				return new WP_Error( 'database error', '数据库出错,该邮箱可能已注册', array('status' => '505') );
+				//如果用户未创建，创建用户，并发起请求
+				$columns["uid"] = getOrderNo("ma");
+				$columns["email"] = $request["email"];
+				$columns["name"] = $request["name"];
+				$columns["company"] = $request["company"];
+				$columns["job"] = $request["job"];
+				$columns["phone"] = $request["phone"];
+				$columns["type"] = $request["type"];
+				$columns["total_amount"] = $request["total_amount"];				
+				global $wpdb;	
+				//插入新用户，状态为unpaid			
+				$ts1 = $wpdb->insert( 
+					APPLICANT_TABLE, 
+					$columns
+				);
+				if ($ts1) {
+					#发起支付请求
+					if ($request["payment_type"] === 'alipay') {
+						#支付宝请求
+						require_once("utils/payment/payment.php");						
+						#创建aop实例
+						$alipay = new Alipayment();					
+						#返回支付订单页
+						$result = $alipay->payRequest(Array(
+							'returnUrl' => 'https://zhidao.baidu.com/question/146272957.html',
+							'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl',
+							'out_trade_no' => $columns["uid"],
+							'subject' => '支付宝测试请求',
+							'total_amount' => $request["total_amount"],
+							'body' => '支付宝测试请求'
+						));						
+						return $result;
+					}
+				} else {
+					return new WP_Error( 'database error', '数据库出错', array('status' => '505') );
+				}
 			}
 		} else {
 			//验证失败
@@ -616,12 +624,42 @@
 			write_log_file("验签成功");
 			write_log_file($str);
 			write_log_file("支付宝验签结束-----------------");
-			echo 'success';
+			#验签成功，开始业务验证
+			if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
+				#判断是否存在该uid用户, 总金额是否正确，appid是否一致
+				require_once("config.php");				
+				$applicant = $wpdb->get_row( "SELECT * FROM " . APPLICANT_TABLE . " WHERE uid = '{$_POST['out_trade_no']}' ", OBJECT );
+				if ($applicant && $applicant->total_amount === $_POST['total_amount'] && $alipayConfig['appId'] === $_POST['app_id']) {
+					#实现业务逻辑
+					$query = $wpdb->insert( 
+						APPLICANT_TABLE, 
+						array(
+							'payment_status' => 'paid',
+							'trade_no' => $_POST['trade_no']
+						)
+					);
+					if (query) {
+						$code_html = generateBarcode($_POST['out_trade_no']);
+						$result = sendEmail("smtp.qq.com", 
+							"no-reply", 
+							"359593891@qq.com", 
+							"bmmytyvhsqxkbigd", 
+							$_POST["from_email"], 
+							"no-reply", 
+							"
+							<h1>这是您入场用的条形码。<h1>
+							<h5>请妥善保管。</h5>
+							<div>{$code_html}</div>
+							");
+					}
+				}
+			}
+			return 'success';
 		} else {
 			write_log_file("验签失败");
 			write_log_file($str);
 			write_log_file("支付宝验签结束-----------------");
-			echo 'fail';
+			return 'fail';
 		}		
 	}
 	
