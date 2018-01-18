@@ -610,16 +610,16 @@
 			$arr[$key] = stripslashes($value);		
 		}
 		$str = substr($str,0,strlen($str)-1);
-		$flag = $alipay($arr);
+		$flag = $alipay->check($arr);
 		write_log_file("支付宝验签开始-----------------");
 		if ($flag) {
 			write_log_file("验签成功");
 			write_log_file($str);
-			return 'success'
+			return 'success';
 		} else {
 			write_log_file("验签失败");
 			write_log_file($str);
-			return 'fail'
+			return 'fail';
 		}
 		write_log_file("支付宝验签结束-----------------");
 	}
