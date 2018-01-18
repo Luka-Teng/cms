@@ -602,9 +602,10 @@
 			$str .= $key . '=' . stripslashes($value) . '&';
 			$_POST[$key] = stripslashes($value);		
 		}
+		$str = substr($str,0,strlen($str)-1)
 		$aop = new AopClient;
 		$aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv7PkFfpn7CRPVaHDtDz1FERp10hEMjjztYsfmiLLTRBGPAi6pIDTszwRSnkiB39osnwyaWeCJmGPMbp0qz6GgkqT/a+GTkbHnZA7vwykjfT8vA5i2EnqycfBem585o0dABZQfZEenIGGkxxcIK8gGe+d1tFnWjqR+T70uA/WrvoCtKDZ9oAWlPoUXCx9iPyunwPvFedurgMZZ3UiP3AE/avU0eAoWqYMrjXOZYELjdPLvwRRCn3n3Y9hzLejidCcXSwp0vkgtslL/t4w2hNOsidHHx/VGo6/OeTJeNGoqA3FtQMB8nPBUPnMMU5pf7XkulBCE1n0UbBaCLL3mvWsnQIDAQAB';
-		$flag = $aop->rsaCheckV1($_POST, 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv7PkFfpn7CRPVaHDtDz1FERp10hEMjjztYsfmiLLTRBGPAi6pIDTszwRSnkiB39osnwyaWeCJmGPMbp0qz6GgkqT/a+GTkbHnZA7vwykjfT8vA5i2EnqycfBem585o0dABZQfZEenIGGkxxcIK8gGe+d1tFnWjqR+T70uA/WrvoCtKDZ9oAWlPoUXCx9iPyunwPvFedurgMZZ3UiP3AE/avU0eAoWqYMrjXOZYELjdPLvwRRCn3n3Y9hzLejidCcXSwp0vkgtslL/t4w2hNOsidHHx/VGo6/OeTJeNGoqA3FtQMB8nPBUPnMMU5pf7XkulBCE1n0UbBaCLL3mvWsnQIDAQAB', 'utf-8', "RSA2");
+		$flag = $aop->rsaCheckV1($str, 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv7PkFfpn7CRPVaHDtDz1FERp10hEMjjztYsfmiLLTRBGPAi6pIDTszwRSnkiB39osnwyaWeCJmGPMbp0qz6GgkqT/a+GTkbHnZA7vwykjfT8vA5i2EnqycfBem585o0dABZQfZEenIGGkxxcIK8gGe+d1tFnWjqR+T70uA/WrvoCtKDZ9oAWlPoUXCx9iPyunwPvFedurgMZZ3UiP3AE/avU0eAoWqYMrjXOZYELjdPLvwRRCn3n3Y9hzLejidCcXSwp0vkgtslL/t4w2hNOsidHHx/VGo6/OeTJeNGoqA3FtQMB8nPBUPnMMU5pf7XkulBCE1n0UbBaCLL3mvWsnQIDAQAB', 'utf-8', "RSA2");
 		write_log_file("lialialai");
 		if ($flag) {
 			write_log_file("ok");
