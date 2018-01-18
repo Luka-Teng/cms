@@ -628,7 +628,7 @@
 			#验签成功，开始业务验证
 			if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
 				#判断是否存在该uid用户, 总金额是否正确，appid是否一致
-				require_once("config.php");
+				require_once("utils/payment/config.php");
 				global $wpdb;				
 				$applicant = $wpdb->get_row( "SELECT * FROM " . APPLICANT_TABLE . " WHERE uid = '{$_POST['out_trade_no']}' ", OBJECT );
 				if ($applicant && $applicant->total_amount === $_POST['total_amount'] && $alipayConfig['appId'] === $_POST['app_id']) {
