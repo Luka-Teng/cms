@@ -55,11 +55,12 @@
 	//send email
 	use PHPMailer\PHPMailer\PHPMailer;
 	use PHPMailer\PHPMailer\Exception;
-	function sendEmail($host, $from_name, $from_email, $from_password, $to_email, $subject, $content) {
+	function sendEmail($to_email, $subject, $content) {
 		// 引入PHPMailer的核心文件
 		require_once("utils/phpMailer/PHPMailer.php");
 		require_once("utils/phpMailer/SMTP.php");
-		require_once('utils/phpMailer/Exception.php');	
+		require_once('utils/phpMailer/Exception.php');
+		require_once('utils/phpMailer/config.php');
 		// 实例化PHPMailer核心类
 		$mail = new PHPMailer();
 		// 是否启用smtp的debug进行调试 开发环境建议开启 生产环境注释掉即可 默认关闭debug调试模式
@@ -69,7 +70,7 @@
 		// smtp需要鉴权 这个必须是true
 		$mail->SMTPAuth = true;
 		// 链接qq域名邮箱的服务器地址
-		$mail->Host = $host;
+		$mail->Host = $emailConfig['host'];
 		// 设置使用ssl加密方式登录鉴权
 		$mail->SMTPSecure = 'ssl';
 		// 设置ssl连接smtp服务器的远程服务器端口号
@@ -77,13 +78,13 @@
 		// 设置发送的邮件的编码
 		$mail->CharSet = 'UTF-8';
 		// 设置发件人昵称 显示在收件人邮件的发件人邮箱地址前的发件人姓名
-		$mail->FromName = $from_name;
+		$mail->FromName = $emailConfig['from_name'];
 		// smtp登录的账号 QQ邮箱即可
-		$mail->Username = $from_email;
+		$mail->Username = $emailConfig['from_email'];
 		// smtp登录的密码 使用生成的授权码
-		$mail->Password = $from_password;
+		$mail->Password = $emailConfig['from_password'];
 		// 设置发件人邮箱地址 同登录账号
-		$mail->From = $from_email;
+		$mail->From = $emailConfig['from_email'];
 		// 邮件正文是否为html编码 注意此处是一个方法
 		$mail->isHTML(true);
 		// 设置收件人邮箱地址
@@ -449,11 +450,8 @@
 		if (is_wp_error($result)) {
 			return $result;
 		}
-		$result = sendEmail("smtp.qq.com", 
-			"no-reply", 
-			"359593891@qq.com", 
-			"bmmytyvhsqxkbigd", 
-			"{$request["email"]}", 
+		$result = sendEmail (
+			$request["email"],
 			"no-reply", 
 			"
 			<h1>请保管好验证码，切勿泄露<h1>
@@ -538,7 +536,7 @@
 					#返回支付订单页
 					$result = $alipay->payRequest(Array(
 						'returnUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/return-url',
-						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl/?from_email=' . $request["email"],
+						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl/?to_email=' . $request["email"],
 						'out_trade_no' => $applicant->uid,
 						'subject' => '支付宝测试请求',
 						'total_amount' => $request["total_amount"],
@@ -572,7 +570,7 @@
 						#返回支付订单页
 						$result = $alipay->payRequest(Array(
 							'returnUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/return-url',
-							'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl/?from_email=' . $request["email"],
+							'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl/?to_email=' . $request["email"],
 							'out_trade_no' => $columns["uid"],
 							'subject' => '支付宝测试请求',
 							'total_amount' => $request["total_amount"],
@@ -616,8 +614,8 @@
 		#用于返回校验结果
 		foreach ($_POST as $key => $value) {
 			$str .= $key . '=' . stripslashes($value) . '&';
-			#自传参数不参加校验，自传参数目前只有from_email
-			if ($key === 'from_email') {
+			#自传参数不参加校验，自传参数目前只有to_email
+			if ($key === 'to_email') {
 				continue;
 			}
 			$arr[$key] = stripslashes($value);		
@@ -664,11 +662,8 @@
 					);
 					if ($query) {
 						$code_html = generateBarcode($_POST['out_trade_no']);
-						$result = sendEmail("smtp.qq.com", 
-							"no-reply", 
-							"359593891@qq.com", 
-							"bmmytyvhsqxkbigd", 
-							"{$_POST['from_email']}", 
+						$result = sendEmail(
+							$_POST['to_email'],
 							"no-reply", 
 							"
 							<h1>这是您入场用的条形码。<h1>
