@@ -645,13 +645,13 @@
 							'trade_no' => $_POST['trade_no']
 						)
 					);
-					if (query) {
+					if ($query) {
 						$code_html = generateBarcode($_POST['out_trade_no']);
 						$result = sendEmail("smtp.qq.com", 
 							"no-reply", 
 							"359593891@qq.com", 
 							"bmmytyvhsqxkbigd", 
-							$_POST["from_email"], 
+							"{$_POST['from_email']}", 
 							"no-reply", 
 							"
 							<h1>这是您入场用的条形码。<h1>
