@@ -607,7 +607,7 @@
 	function alipay_notifyUrl($request){
 		#支付宝请求
 		require_once("utils/payment/payment.php");
-		require_once("utils/payment/config.php");		
+		require("utils/payment/config.php");		
 		#创建alipay实例
 		$alipay = new Alipayment();
 		#用于输出日志
