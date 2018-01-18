@@ -523,6 +523,7 @@
 		$result = checkout_email_code($request["email"], $request["email_code"]);
 		if ($result) {
 			#判断该邮箱是否注册，或者该注册邮箱是否unpaid
+			global $wpdb;
 			$applicant = $wpdb->get_row( "SELECT * FROM " . APPLICANT_TABLE . " WHERE email = '{$request["email"]}' ", OBJECT );
 			if ($applicant && $applicant->payment_status === 'paid') {
 				#如果用户已付款，直接输出错误
@@ -627,7 +628,8 @@
 			#验签成功，开始业务验证
 			if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
 				#判断是否存在该uid用户, 总金额是否正确，appid是否一致
-				require_once("config.php");				
+				require_once("config.php");
+				global $wpdb;				
 				$applicant = $wpdb->get_row( "SELECT * FROM " . APPLICANT_TABLE . " WHERE uid = '{$_POST['out_trade_no']}' ", OBJECT );
 				if ($applicant && $applicant->total_amount === $_POST['total_amount'] && $alipayConfig['appId'] === $_POST['app_id']) {
 					#实现业务逻辑
