@@ -606,8 +606,7 @@
 	}
 	function alipay_notifyUrl($request){
 		#支付宝请求
-		require_once("utils/payment/payment.php");
-		require("utils/payment/config.php");		
+		require_once("utils/payment/payment.php");		
 		#创建alipay实例
 		$alipay = new Alipayment();
 		#用于输出日志
@@ -634,6 +633,7 @@
 			if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
 				#判断是否存在该uid用户, 总金额是否正确，appid是否一致
 				global $wpdb;
+				require("utils/payment/config.php");
 				$applicant = $wpdb->get_row( "SELECT * FROM " . APPLICANT_TABLE . " WHERE uid = '{$_POST['out_trade_no']}' ", OBJECT );
 				if ($applicant) {
 					write_log_file("查到这个用户");
