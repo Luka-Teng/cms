@@ -1,7 +1,6 @@
 <?php
 	#载入支付宝的sdk
-	include("alipay/AopSdk.php");
-	include("config.php");
+	require_once("alipay/AopSdk.php");
 	#支付宝类包装
 	class Alipayment {
 		#获取aop实例
@@ -10,6 +9,7 @@
 		#对aop进行初始化
 		function __construct() {
 			#读取config参数，初始化aop
+			require_once("config.php");
 			$this->c = new AopClient();
 			$this->c->gatewayUrl = $alipayConfig['gatewayUrl'];
 			$this->c->appId = $alipayConfig['appId'];
