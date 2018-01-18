@@ -1,7 +1,7 @@
 jQuery(document).ready(function($) {
 	//common tools handling
 	function showError (msg) {
-		msg === '' ? msg = 'error' : ''
+		msg ? msg = 'error' : ''
 		$("#error")
 			.addClass("active")
 			.find('.error-content').html(msg)

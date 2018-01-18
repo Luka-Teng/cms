@@ -537,7 +537,7 @@
 					$alipay = new Alipayment();					
 					#返回支付订单页
 					$result = $alipay->payRequest(Array(
-						'returnUrl' => 'https://zhidao.baidu.com/question/146272957.html',
+						'returnUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/return-url',
 						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl/?from_email=' . $request["email"],
 						'out_trade_no' => $applicant->uid,
 						'subject' => '支付宝测试请求',
@@ -571,7 +571,7 @@
 						$alipay = new Alipayment();					
 						#返回支付订单页
 						$result = $alipay->payRequest(Array(
-							'returnUrl' => 'https://zhidao.baidu.com/question/146272957.html',
+							'returnUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/return-url',
 							'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl/?from_email=' . $request["email"],
 							'out_trade_no' => $columns["uid"],
 							'subject' => '支付宝测试请求',
@@ -654,12 +654,13 @@
 				}
 				if ($applicant && $applicant->total_amount === $_POST['total_amount'] && $alipayConfig['appId'] === $_POST['app_id']) {
 					#实现业务逻辑
-					$query = $wpdb->insert( 
+					$query = $wpdb->update(
 						APPLICANT_TABLE, 
 						array(
 							'payment_status' => 'paid',
 							'trade_no' => $_POST['trade_no']
-						)
+						), 
+						array('uid' => $_POST['out_trade_no'])
 					);
 					if ($query) {
 						$code_html = generateBarcode($_POST['out_trade_no']);
