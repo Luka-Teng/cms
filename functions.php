@@ -116,7 +116,6 @@
 	define('CAROUSEL_TABLE', $wpdb->prefix . 'carousel');
 	define('EMAIL_VERIFICATION_TABLE', $wpdb->prefix . 'email_verification');
 	define('APPLICANT_TABLE', $wpdb->prefix . 'applicant');
-	define('AUDIENCE_TABLE', $wpdb->prefix . 'audience_applicant');
 	// 插件激活时，运行回调方法创建数据表, 在WP原有的options表中插入插件版本号
 	add_action('after_switch_theme', 'initdb');
 	function initdb() {
@@ -508,7 +507,8 @@
 				  ),
 				  'payment_type' => array(
 					'validate_callback' => function ($param) {
-						return isInArray($param, ['alipay', 'wechat']);
+						//付款类型可以是免费，支付宝，微信
+						return isInArray($param, ['alipay', 'wechat', 'free']);
 					}
 				  )
 				)
@@ -516,6 +516,61 @@
 		);
 	}
 	
+	//付款后的业务逻辑代码
+	function after_paid($applicant_email, $applicant_uid, $trade_no) {
+		#免费请求， 直接修改paid数据
+		global $wpdb;
+		$query = $wpdb->update(
+			APPLICANT_TABLE, 
+			array(
+				'payment_status' => 'paid',
+				'trade_no' => $trade_no
+			), 
+			array('email' => $applicant_email)
+		);
+		//如果数据库请求成功
+		if ($query) {
+			$code_html = generateBarcode($applicant_uid);
+			$email_result = sendEmail(
+				$applicant_email,
+				"no-reply", 
+				"
+				<h1>这是您入场用的条形码。<h1>
+				<h5>请妥善保管。</h5>
+				<div>{$code_html}</div>
+				");
+		}
+		//返回成功和错误数据
+		if (!$query) {
+			return new WP_Error( 'database error', '数据库出错', array('status' => '505') );
+		} else if (!$email_result) {
+			return new WP_Error( 'email sent error', '邮件无法发送', array('status' => '505') );
+		} else {
+			return array(
+        		'status' => 'success',
+        		'message' => '购买成功'
+			);
+		}
+	}
+
+	//支付宝付款方法
+	function alipay_pay($applicant_email, $applicant_uid, $total_amount, $subject, $body) {
+		#支付宝请求
+		require_once("utils/payment/payment.php");						
+		#创建alipay实例
+		$alipay = new Alipayment();					
+		#返回支付订单页
+		$result = $alipay->payRequest(Array(
+			'returnUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/return-url',
+			'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl/?to_email=' . $applicant_email,
+			'out_trade_no' => $applicant_uid,
+			'subject' => $subject,
+			'total_amount' => $total_amount,
+			'body' => $body
+		));						
+		return $result;
+	}
+
 	function create_applicant($request){
 		//检查验证码是否正确
 		$result = checkout_email_code($request["email"], $request["email_code"]);
@@ -529,20 +584,11 @@
 			} else if ($applicant && $applicant->payment_status === 'unpaid') {
 				#如果用户以创建，但是未付款，直接发起付款请求
 				if ($request["payment_type"] === 'alipay') {
-					#支付宝请求
-					require_once("utils/payment/payment.php");						
-					#创建alipay实例
-					$alipay = new Alipayment();					
-					#返回支付订单页
-					$result = $alipay->payRequest(Array(
-						'returnUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/return-url',
-						'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl/?to_email=' . $request["email"],
-						'out_trade_no' => $applicant->uid,
-						'subject' => '支付宝测试请求',
-						'total_amount' => $request["total_amount"],
-						'body' => '支付宝测试请求'
-					));						
-					return $result;
+					//发起支付宝请求
+					return alipay_pay($applicant->email, $applicant->uid, $request["total_amount"], 'alipay_subject', 'alipay_body');
+				}	else if ($request["payment_type"] === 'free') {	
+					//直接开始付款后的业务逻辑
+					return after_paid($applicant->email, $applicant->uid, 'FREE');
 				}
 			} else {
 				//如果用户未创建，创建用户，并发起请求
@@ -563,20 +609,11 @@
 				if ($ts1) {
 					#发起支付请求
 					if ($request["payment_type"] === 'alipay') {
-						#支付宝请求
-						require_once("utils/payment/payment.php");						
-						#创建aop实例
-						$alipay = new Alipayment();					
-						#返回支付订单页
-						$result = $alipay->payRequest(Array(
-							'returnUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/return-url',
-							'notifyUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/wp-json/apis/alipay_notifyUrl/?to_email=' . $request["email"],
-							'out_trade_no' => $columns["uid"],
-							'subject' => '支付宝测试请求',
-							'total_amount' => $request["total_amount"],
-							'body' => '支付宝测试请求'
-						));						
-						return $result;
+						//发起支付宝请求
+						return alipay_pay($columns["email"], $columns["uid"], $columns["total_amount"], 'alipay_subject', 'alipay_body');
+					}	else if ($request["payment_type"] === 'free') {
+						//直接开始付款后的业务逻辑
+						return after_paid($columns["email"], $columns["uid"], 'FREE');
 					}
 				} else {
 					return new WP_Error( 'database error', '数据库出错', array('status' => '505') );
@@ -652,25 +689,7 @@
 				}
 				if ($applicant && $applicant->total_amount === $_POST['total_amount'] && $alipayConfig['appId'] === $_POST['app_id']) {
 					#实现业务逻辑
-					$query = $wpdb->update(
-						APPLICANT_TABLE, 
-						array(
-							'payment_status' => 'paid',
-							'trade_no' => $_POST['trade_no']
-						), 
-						array('uid' => $_POST['out_trade_no'])
-					);
-					if ($query) {
-						$code_html = generateBarcode($_POST['out_trade_no']);
-						$result = sendEmail(
-							$_POST['to_email'],
-							"no-reply", 
-							"
-							<h1>这是您入场用的条形码。<h1>
-							<h5>请妥善保管。</h5>
-							<div>{$code_html}</div>
-							");
-					}
+					after_paid($_POST['to_email'], $_POST['out_trade_no'], $_POST['trade_no']);
 				}
 			}
 			return 'success';
@@ -689,7 +708,7 @@
 	//define exporting method
 	function export_excel($table_name) {   
 	    global $wpdb;
-		$applicants = $wpdb->get_results( "SELECT * FROM " . $wpdb->prefix . $table_name, OBJECT );
+		$applicants = $wpdb->get_results( "SELECT * FROM " . $table_name, OBJECT );
 		$wpdb->show_errors();
 		if ($wpdb->last_error) {
 			return new WP_Error( 'database error', $wpdb->last_error, array('status' => '505') );
@@ -715,8 +734,14 @@
 			$result .= "</tr><thead><tbody>";
 			foreach ($applicants as $applicant) {
 				$result .= "<tr>";
+				$index = 0;
 				foreach($applicant as $key => $value) {
-					$result .= "<td>{$value}</td>";
+					$index++;
+					if ($key === 'id') {
+						$result .= "<td>{$index}</td>";
+					} else {
+						$result .= "<td>{$value}</td>";
+					}
 				}
 				$result .= "</tr>";
 			}
@@ -734,13 +759,13 @@
 	}
 	
 	//for media applicants
-	add_action( 'rest_api_init', 'media_excel_hook' );
-	function media_excel_hook() {
+	add_action( 'rest_api_init', 'applicant_excel_hook' );
+	function applicant_excel_hook() {
 		register_rest_route(
-			'apis', 'media_excel',
+			'apis', 'applicant_excel',
 			array(
 				'methods'  => 'GET',
-				'callback' => 'media_excel',
+				'callback' => 'applicant_excel',
 				'permission_callback' => function () {
 					return isAdministrator();
 				}
@@ -748,8 +773,8 @@
 		);
 	}
 	
-	function media_excel($request){
-		return export_excel("media_applicant");
+	function applicant_excel($request){
+		return export_excel(APPLICANT_TABLE);
 	}
 ?>
 

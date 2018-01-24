@@ -270,7 +270,7 @@ jQuery(document).ready(function($) {
 	$(function () {
 		$('#export-media-excel').click(function () {
 			showLoading ()
-			var url = magicalData.siteURL + '/wp-json/apis/media_excel'
+			var url = magicalData.siteURL + '/wp-json/apis/applicant_excel'
 			$.ajax({
 				type: 'get',
 				url: url,
@@ -352,6 +352,7 @@ jQuery(document).ready(function($) {
 		$("#create_media_applicant").click(function () {
 			showLoading ()
 			var url = magicalData.siteURL + '/wp-json/apis/create_applicant'
+			var payment_type = 'free'
 			$.ajax({
 				type: 'post',
 				url: url,
@@ -363,13 +364,13 @@ jQuery(document).ready(function($) {
 					job: $("#job").val(),
 					phone: $("#phone").val(),
 					type: 'media',
-					payment_type: 'alipay',
+					payment_type: payment_type,
 					total_amount: '200.00'
 				},
 			    success: function (data) {
 			    	console.log(data)
-					$("body").append(data)
 					showflash('创建成功', 'success')
+					payment_type === 'free' ? refreshLoading () : $("body").append(data)									
 			    },
 			    error: function (data) {
 					refreshLoading ()

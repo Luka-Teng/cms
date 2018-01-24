@@ -24,6 +24,32 @@
 	z-index: 2;
 }
 
+/*grid*/
+.col-1 {
+}
+.col-2 {
+}
+.col-2 {
+}
+.col-2 {
+}
+.col-2 {
+}
+.col-2 {
+}
+.col-2 {
+}
+.col-2 {
+}
+.col-2 {
+}
+.col-2 {
+}
+.col-2 {
+}
+.col-2 {
+}
+
 @keyframes AlertFadeIn{
 	0%{opacity:0}
 	100%{opacity:1}
