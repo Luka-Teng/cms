@@ -63,9 +63,12 @@ jQuery(document).ready(function($) {
 		canDownload('/wp-content/uploads');
 		//上传图片显示
 		[1,2,3,4,5].forEach(function (element) {
-			$('#carousel_' + element).change(function (event) {
-				onFilePicked(event.target.files[0], document.getElementById('carousel-target-' + element))
-			}) 
+			$('#carousel_' + element + '_1').change(function (event) {
+				onFilePicked(event.target.files[0], document.getElementById('carousel-target-' + element + '-1'))
+			})
+			$('#carousel_' + element + '_2').change(function (event) {
+				onFilePicked(event.target.files[0], document.getElementById('carousel-target-' + element + '-2'))
+			}) 			
 		})
 	})
 	

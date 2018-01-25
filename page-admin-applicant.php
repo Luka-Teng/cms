@@ -18,6 +18,7 @@
 					<th>职位</th>
 					<th>电话</th>
 					<th>创建日期</th>
+					<th>付款情况</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -31,6 +32,7 @@
 						<td><?php echo $applicant->job ?></td>
 						<td><?php echo $applicant->phone ?></td>
 						<td><?php echo $applicant->time ?></td>
+						<td><?php echo $applicant->payment_status === 'paid' ? '已付款' : '未付款' ?></td>
 					</tr>
 				<?php } ?>
 			</tbody>

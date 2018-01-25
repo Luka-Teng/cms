@@ -169,15 +169,16 @@
 	    	$sql3_1 = "CREATE TABLE " . CAROUSEL_TABLE . " (
 		        id mediumint(9) NOT NULL AUTO_INCREMENT,
 		        time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		        url varchar(55) DEFAULT '' NOT NULL,
+		        url_1 varchar(100) DEFAULT '' NOT NULL,
+				url_2 varchar(55) DEFAULT '' NOT NULL,
 		        name varchar(20) NOT NULL,
 		        UNIQUE KEY id (id)
 		    ) $charset_collate;";
-			$sql3_2 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_1')";
-			$sql3_3 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_2')";
-			$sql3_4 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_3')";
-			$sql3_5 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_4')";
-			$sql3_6 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', 'carousel_5')";
+			$sql3_2 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url_1`, `url_2`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', '/', 'carousel_1')";
+			$sql3_3 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url_1`, `url_2`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', '/', 'carousel_2')";
+			$sql3_4 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url_1`, `url_2`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', '/', 'carousel_3')";
+			$sql3_5 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url_1`, `url_2`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', '/', 'carousel_4')";
+			$sql3_6 = "INSERT INTO " . CAROUSEL_TABLE . "(`id`, `time`, `url_1`, `url_2`, `name`) VALUES (NULL, CURRENT_TIMESTAMP, '/', '/', 'carousel_5')";
 		    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		    dbDelta( $sql3_1 );
 			dbDelta( $sql3_2 );
@@ -264,9 +265,10 @@
 					mkdir($dir_path, 0700);
 				}
 				if (!file_exists($file_path)) {
-					move_uploaded_file($_FILES[$name]["tmp_name"], $file_path);
+					//先将名字转化为utf-8在保存，防止中文乱码
+					move_uploaded_file($_FILES[$name]["tmp_name"], iconv('utf-8','gb2312',$file_path));
 				}
-				$wpdb->update($wpdb->prefix . 'carousel', array( 'url' => $file_path), array('name' => $name));
+				$wpdb->update(CAROUSEL_TABLE, array('url_' . substr($name,-1) => $file_path), array('name' => substr($name, 0, 10)));
 				$wpdb->show_errors();
 				if ($wpdb->last_error) {
 					return new WP_Error( 'database error', $wpdb->last_error, array('status' => '505') );
@@ -284,7 +286,7 @@
 	}
 	//carousel_upload method
 	function carousel_upload($request){
-		$white_names = ['carousel_1', 'carousel_2', 'carousel_3', 'carousel_4', 'carousel_5'];
+		$white_names = ['carousel_1_1', 'carousel_1_2', 'carousel_2_1', 'carousel_2_2', 'carousel_3_1', 'carousel_3_2', 'carousel_4_1', 'carousel_4_2', 'carousel_5_1', 'carousel_5_2'];
 		foreach ($white_names as $name) {
 			if (isset($_FILES[$name])) {
 				return carousel_upload_func($name);
