@@ -75,7 +75,7 @@
 							<li>
 								<span class="glyphicon glyphicon-play"></span>
 								<a href="<?php echo get_permalink($left_posts[$i]->ID)?>"><?php echo $left_posts[$i]->post_title ?></a>
-								<span class="news-date"><?php echo $left_posts[$i]->post_modified ?></span>
+								<span class="news-date"><?php echo explode(" ", $left_posts[$i]->post_modified)[0] ?></span>
 							</li>
 						<?php } ?>					
 					</ul>
@@ -95,7 +95,7 @@
 							<li>
 								<span class="glyphicon glyphicon-play"></span>
 								<a href="<?php echo get_permalink($right_posts[$i]->ID)?>"><?php echo $right_posts[$i]->post_title ?></a>
-								<span class="news-date"><?php echo $right_posts[$i]->post_modified ?></span>
+								<span class="news-date"><?php echo explode(" ", $right_posts[$i]->post_modified)[0] ?></span>
 							</li>
 						<?php } ?>
 					</ul>
