@@ -60,9 +60,10 @@
 									<div class="col-sm-6 sub-menu-item">
 										<a href="<?php echo get_the_permalink($single_post->ID) ?>"><?php echo $single_post->post_title; ?></a>
 									</div>
-								<?php if ($loop_num % 2 === 2) { echo '</div>'; } ?>	
+								<?php if ($loop_num % 2 === 0) { echo '</div>'; } ?>	
 								<?php $loop_num++ ?>
 							<?php } ?>
+							<?php if (count($all_posts) % 2 === 1) { echo '</div>'; } ?>
 						</div>
 					</li>
 				<?php } ?>

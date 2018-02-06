@@ -68,7 +68,7 @@
 				<div class="news-zone-content">
 					<ul>
 						<?php $left_posts = get_posts(array(
-							'category' => 6,
+							'category_name' => 'activity',
 							'numberposts' => 8
 						)); ?>
 						<?php for ($i = 0; $i < count($left_posts); $i++) { ?>
@@ -88,10 +88,10 @@
 				<div class="news-zone-content">
 					<ul>
 						<?php $right_posts = get_posts(array(
-							'category' => 4,
+							'category_name' => 'show-center',
 							'numberposts' => 8
 						)); ?>
-						<?php for ($i = 0; $i < count($left_posts); $i++) { ?>
+						<?php for ($i = 0; $i < count($right_posts); $i++) { ?>
 							<li>
 								<span class="glyphicon glyphicon-play"></span>
 								<a href="<?php echo get_permalink($right_posts[$i]->ID)?>"><?php echo $right_posts[$i]->post_title ?></a>
