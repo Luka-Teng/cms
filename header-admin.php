@@ -4,6 +4,7 @@
 		<meta charset="<?php bloginfo('charset'); ?>">
 		<meta name="viewport" content="width=device-width, initial-scale=1" >
 		<title>CMS</title>
+		<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/lib/bootstrap/css/bootstrap.css' ?>" type="text/css" media="all">
 		<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/css/backend.css' ?>" type="text/css" media="all">
 		<?php wp_head(); ?>
 	</head>	
@@ -14,7 +15,7 @@
 		<nav class="navbar navbar-inverse border-radius-0" role="navigation">
 			<div class="container-fluid">
 				<div class="navbar-header">
-					<a class="navbar-brand" href="/admin-index">CMS</a>
+					<a class="navbar-brand" href="/admin">CMS</a>
 					<span class="text-muted nav-sub-brand">后台模块</span>
 				</div>
 				<div>

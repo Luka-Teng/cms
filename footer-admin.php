@@ -16,7 +16,10 @@
 	<!--footer nav-->
 	
 </div><!-- container -->
-
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
+<script src="<?php echo get_template_directory_uri() . '/js/bootstrap.min.js' ?>"></script>
+<script src="<?php echo get_template_directory_uri() . '/js/validate.js' ?>"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/3.8.5/echarts-en.common.min.js"></script>
 <?php wp_footer(); ?>
 </body>
 </html>

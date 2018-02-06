@@ -61,7 +61,7 @@ jQuery(document).ready(function($) {
 		})
 		//提供下载链接
 		canDownload('/wp-content/uploads');
-		//上传图片显示
+		//轮播图上传图片显示
 		[1,2,3,4,5].forEach(function (element) {
 			$('#carousel_' + element + '_1').change(function (event) {
 				onFilePicked(event.target.files[0], document.getElementById('carousel-target-' + element + '-1'))
@@ -69,6 +69,13 @@ jQuery(document).ready(function($) {
 			$('#carousel_' + element + '_2').change(function (event) {
 				onFilePicked(event.target.files[0], document.getElementById('carousel-target-' + element + '-2'))
 			}) 			
+		});
+		
+		//banner上传图片显示
+		[1,2,3,4,5,6,7,8].forEach(function (element) {
+			$('#banner_' + element).change(function (event) {
+				onFilePicked(event.target.files[0], document.getElementById('banner-target-' + element))
+			})		
 		})
 	})
 	
@@ -199,6 +206,43 @@ jQuery(document).ready(function($) {
 		})
 	})
 	
+	//banner upload
+	$(function () {
+		$(".banner-upload-btn").click(function () {
+			showLoading ()
+			var that = $(this)
+			var banner_name = $(this).data('banner')
+			var file = document.getElementById(banner_name).files[0]
+			var form_data=new FormData()
+			form_data.append(banner_name, file)
+			form_data.append('title', $('#' + banner_name + '_title').val())
+			form_data.append('link', $('#' + banner_name + '_link').val())
+			form_data.append('uid', banner_name.charAt(banner_name.length-1))
+			var url = magicalData.siteURL + '/wp-json/apis/update_banner'
+			$.ajax({
+				type: 'post',
+				url: url,
+				data: form_data,
+				contentType:false,
+				processData:false,
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
+				},
+			    success: function (data) {
+			    	refreshLoading ()
+			    	showflash('上传成功', 'success')
+			    	that.parent().addClass("active")
+			    	console.log(data)
+			    },
+			    error: function (data) {
+			    	refreshLoading ()
+			    	showflash(data, 'error')
+			    }
+			})
+		})
+	})
+	
+	
 	//carousel upload
 	$(function () {
 		$(".carousel-upload-btn").click(function () {
@@ -255,7 +299,7 @@ jQuery(document).ready(function($) {
 				    	refreshLoading ()
 				    	showflash('删除成功', 'success')
 				    	document.getElementById(carousel_name).value = ''
-				    	document.getElementById('carousel-target-' + carousel_name.split('carousel_')[1]).src 
+				    	document.getElementById('carousel-target-' + carousel_name.split('carousel_')[1].replace('_', '-' )).src 
 				    		= window.location.origin + '/wp-content/themes/cms/img/alt.jpg'
 				    	that.parent().removeClass("active")
 				    	console.log(data)
@@ -310,7 +354,7 @@ jQuery(document).ready(function($) {
 				data: data,
 			    success: function (data) {
 			    	if (data.status === 'success') {
-			    		window.location = '/admin-index'
+			    		window.location = '/admin'
 			    	} else if (data.status === 'error') {
 			    		refreshLoading ()
 			    		showError(data.message)

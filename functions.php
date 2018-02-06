@@ -8,13 +8,9 @@
 	//load all js or css resources
 	function loading_resources() {	
 		wp_enqueue_style('style', get_stylesheet_uri());
-		wp_enqueue_style('bootstrap_css', get_template_directory_uri() . '/css/bootstrap.min.css');
 		wp_enqueue_script('main_js', get_template_directory_uri() . '/js/main.js', array(
 			'jquery' => 'jquery'
 		), 1.0, true);
-		wp_enqueue_script('bootstrap_js', get_template_directory_uri() . '/js/bootstrap.min.js');
-		wp_enqueue_script('validate_js', get_template_directory_uri() . '/js/validate.js');
-		wp_enqueue_script('echarts', 'https://cdnjs.cloudflare.com/ajax/libs/echarts/3.8.5/echarts-en.common.min.js');
 		wp_localize_script('main_js', 'magicalData', array(
 			'nonce' => wp_create_nonce('wp_rest'),
 			'siteURL' => get_site_url()
@@ -40,6 +36,10 @@
 			'orderby' => 'term_id',
 			'order' => 'ASC'
 		));
+	}
+	//get static resources url
+	function get_static_url($string) {
+		return get_template_directory_uri() . $string;
 	}
 	//pagination functions
 	function get_paginated_data ($table_name, $paged, $data_per_page) {
@@ -116,6 +116,7 @@
 	define('CAROUSEL_TABLE', $wpdb->prefix . 'carousel');
 	define('EMAIL_VERIFICATION_TABLE', $wpdb->prefix . 'email_verification');
 	define('APPLICANT_TABLE', $wpdb->prefix . 'applicant');
+	define('BANNER_TABLE', $wpdb->prefix . 'banner');
 	// 插件激活时，运行回调方法创建数据表, 在WP原有的options表中插入插件版本号
 	add_action('after_switch_theme', 'initdb');
 	function initdb() {
@@ -170,7 +171,7 @@
 		        id mediumint(9) NOT NULL AUTO_INCREMENT,
 		        time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		        url_1 varchar(100) DEFAULT '' NOT NULL,
-				url_2 varchar(55) DEFAULT '' NOT NULL,
+				url_2 varchar(100) DEFAULT '' NOT NULL,
 		        name varchar(20) NOT NULL,
 		        UNIQUE KEY id (id)
 		    ) $charset_collate;";
@@ -186,7 +187,37 @@
 			dbDelta( $sql3_4 );
 			dbDelta( $sql3_5 );
 			dbDelta( $sql3_6 );
-	    }	    
+	    }
+		//创建BANNER数据库
+	    if ($wpdb->get_var('show tables like "' . BANNER_TABLE . '"') !== CAROUSEL_TABLE) {
+	    	$sql4_1 = "CREATE TABLE " . BANNER_TABLE . " (
+		        id mediumint(9) NOT NULL AUTO_INCREMENT,
+		        time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+				uid varchar(50) NOT NULL UNIQUE,
+		        image_url varchar(100) DEFAULT '' NOT NULL,
+		        title varchar(20) NOT NULL,
+				link varchar(100) DEFAULT '' NOT NULL,
+		        UNIQUE KEY id (id)
+		    ) $charset_collate;";
+			$sql4_2 = "INSERT INTO " . BANNER_TABLE . "(`id`, `time`, `uid`, `image_url`, `title`, `link`) VALUES (NULL, CURRENT_TIMESTAMP, '1', '/', 'null', '/')";
+			$sql4_3 = "INSERT INTO " . BANNER_TABLE . "(`id`, `time`, `uid`, `image_url`, `title`, `link`) VALUES (NULL, CURRENT_TIMESTAMP, '2', '/', 'null', '/')";
+			$sql4_4 = "INSERT INTO " . BANNER_TABLE . "(`id`, `time`, `uid`, `image_url`, `title`, `link`) VALUES (NULL, CURRENT_TIMESTAMP, '3', '/', 'null', '/')";
+			$sql4_5 = "INSERT INTO " . BANNER_TABLE . "(`id`, `time`, `uid`, `image_url`, `title`, `link`) VALUES (NULL, CURRENT_TIMESTAMP, '4', '/', 'null', '/')";
+			$sql4_6 = "INSERT INTO " . BANNER_TABLE . "(`id`, `time`, `uid`, `image_url`, `title`, `link`) VALUES (NULL, CURRENT_TIMESTAMP, '5', '/', 'null', '/')";
+			$sql4_7 = "INSERT INTO " . BANNER_TABLE . "(`id`, `time`, `uid`, `image_url`, `title`, `link`) VALUES (NULL, CURRENT_TIMESTAMP, '6', '/', 'null', '/')";
+			$sql4_8 = "INSERT INTO " . BANNER_TABLE . "(`id`, `time`, `uid`, `image_url`, `title`, `link`) VALUES (NULL, CURRENT_TIMESTAMP, '7', '/', 'null', '/')";
+			$sql4_9 = "INSERT INTO " . BANNER_TABLE . "(`id`, `time`, `uid`, `image_url`, `title`, `link`) VALUES (NULL, CURRENT_TIMESTAMP, '8', '/', 'null', '/')";
+		    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		    dbDelta( $sql4_1 );
+			dbDelta( $sql4_2 );
+			dbDelta( $sql4_3 );
+			dbDelta( $sql4_4 );
+			dbDelta( $sql4_5 );
+			dbDelta( $sql4_6 );
+			dbDelta( $sql4_7 );
+			dbDelta( $sql4_8 );
+			dbDelta( $sql4_9 );
+	    }		    
 	}
 ?>
 
@@ -235,6 +266,72 @@
 	
 	/******************************************************/
 	
+	//定义首页的banner模块
+	add_action( 'rest_api_init', 'update_banner_hook' );
+	function update_banner_hook() {
+		register_rest_route(
+			'apis', 'update_banner',
+			array(
+				'methods'  => 'POST',
+				'callback' => 'update_banner',
+				'permission_callback' => function () {
+					return isAdministrator();
+				}
+			)
+		);
+	}
+	function update_banner($request){
+		global $wpdb;
+		$uid = $request['uid'];
+		$banner_name = 'banner_' . $uid;	
+		if (isset($_FILES[$banner_name])) {
+			if ((($_FILES[$banner_name]["type"] === "image/gif") || ($_FILES[$banner_name]["type"] === "image/jpeg")
+				|| ($_FILES[$banner_name]["type"] === "image/jpg") || ($_FILES[$banner_name]["type"] === "image/pjpeg") || ($_FILES[$banner_name]["type"] === "image/png"))
+				&& ($_FILES[$banner_name]["size"] < 2000000)) {
+				if ($_FILES[$banner_name]["error"] > 0) {
+					return new WP_Error( 'file error', $_FILES[$banner_name]["error"], array(status => '505') );
+				} else {
+					global $wpdb;
+					$dir_path = 'wp-content/themes/cms/upload';
+					$file_path = 'wp-content/themes/cms/upload/'.$_FILES[$banner_name]["name"];
+					if (!file_exists($dir_path)) {
+						mkdir($dir_path, 0700);
+					}
+					if (!file_exists($file_path)) {
+						//先将名字转化为utf-8在保存，防止中文乱码
+						move_uploaded_file($_FILES[$banner_name]["tmp_name"], iconv('utf-8','gb2312',$file_path));
+					}
+					$sql = $wpdb->update(BANNER_TABLE, array('image_url' => $file_path, 'title' => $request['title'], 'link' => $request['link']), array('uid' => $uid));
+					if ($sql) {
+						return array(
+							'status' => '200',
+							'message' => 'success'
+						);
+						
+					} else {
+						return new WP_Error( 'database error', 'database error', array('status' => '505') );
+					}
+					
+				}
+			} else {
+				return new WP_Error( 'invalid file', '必须为图片格式，且不能超过2MB', array('status' => '505') );
+			}
+		} else {
+			$sql = $wpdb->update(BANNER_TABLE, array('title' => $request['title'], 'link' => $request['link']), array('uid' => $uid));
+			if ($sql) {
+				return array(
+					'status' => '200',
+					'message' => 'success'
+				);
+				
+			} else {
+				return new WP_Error( 'database error', 'database error', array('status' => '505') );
+			}
+		}
+		
+	}
+	
+	/******************************************************/
 	//define carousel_upload api 
 	add_action( 'rest_api_init', 'carousel_upload_hook' );
 	function carousel_upload_hook() {
@@ -254,7 +351,7 @@
 	function carousel_upload_func($name) {
 		if ((($_FILES[$name]["type"] === "image/gif") || ($_FILES[$name]["type"] === "image/jpeg")
 			|| ($_FILES[$name]["type"] === "image/jpg") || ($_FILES[$name]["type"] === "image/pjpeg") || ($_FILES[$name]["type"] === "image/png"))
-			&& ($_FILES[$name]["size"] < 1000000)) {
+			&& ($_FILES[$name]["size"] < 2000000)) {
 			if ($_FILES[$name]["error"] > 0) {
 				return new WP_Error( 'file error', $_FILES[$name]["error"], array(status => '505') );
 			} else {
@@ -314,10 +411,10 @@
 	//carousel_delete method
 	function carousel_delete($request){
 		$carousel_name = $request['carousel_name'];
-		$white_names = ['carousel_1', 'carousel_2', 'carousel_3', 'carousel_4', 'carousel_5'];
+		$white_names = ['carousel_1_1', 'carousel_1_2', 'carousel_2_1', 'carousel_2_2', 'carousel_3_1', 'carousel_3_2', 'carousel_4_1', 'carousel_4_2', 'carousel_5_1', 'carousel_5_2'];
 		if (in_array($carousel_name, $white_names)) {
 			global $wpdb;
-			$wpdb->update($wpdb->prefix . 'carousel', array( 'url' => '/'), array('name' => $carousel_name));
+			$wpdb->update($wpdb->prefix . 'carousel', array('url_' . substr($carousel_name,-1) => '/'), array('name' => substr($carousel_name	, 0, 10)));
 			$wpdb->show_errors();
 			if ($wpdb->last_error) {
 				return new WP_Error( 'database error', $wpdb->last_error, array('status' => '505') );

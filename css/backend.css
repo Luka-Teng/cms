@@ -28,6 +28,7 @@
     border-bottom: 2px solid #ccc;
     font-size: 20px;
     width: 300px;
+	max-width: 100%;
     color: #444;
 }
 /*grid*/

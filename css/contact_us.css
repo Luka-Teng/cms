@@ -1,0 +1,24 @@
+.content-container{
+    padding-top: 82px;
+}
+.content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.contact-title {
+    text-align: center;
+}
+.contact-element {
+    border-bottom: 1px solid #B3B3B3;
+    font-family: 'function_promedium', arial, sans-serif;
+    font-size: 20px;
+}
+.content-element-title {
+    margin: 10px 0 30px 0;
+}
+.contact-element-para {
+    margin: 0;
+}
+.contact-element-para-second {
+    margin-bottom: 30px;
+}

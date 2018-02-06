@@ -19,6 +19,9 @@
 		<div class="collapse in sidebar-block-children" id="side-bar-2">
 			<a href="/admin-carousel">轮播图模块</a>
 		</div>
+		<div class="collapse in sidebar-block-children" id="side-bar-2">
+			<a href="/admin-home">首页其他</a>
+		</div>
 	</div>
 	<div class="side-block">
 		<a class="sidebar-block-title" data-toggle="collapse" href="#side-bar-3">申请人信息模块</a>
