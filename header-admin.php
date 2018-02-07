@@ -6,6 +6,7 @@
 		<title>CMS</title>
 		<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/lib/bootstrap/css/bootstrap.css' ?>" type="text/css" media="all">
 		<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/css/backend.css' ?>" type="text/css" media="all">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/3.8.5/echarts-en.common.min.js"></script>
 		<?php wp_head(); ?>
 	</head>	
 <body <?php body_class(); ?>>	
