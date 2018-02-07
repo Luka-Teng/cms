@@ -791,11 +791,13 @@
 					after_paid($_POST['to_email'], $_POST['out_trade_no'], $_POST['trade_no']);
 				}
 			}
+			header( 'Content-Type: text/plain; charset=' . get_option( 'blog_charset' ) );
 			return 'success';
 		} else {
 			write_log_file("验签失败");
 			write_log_file($str);
 			write_log_file("支付宝验签结束-----------------");
+			header( 'Content-Type: text/plain; charset=' . get_option( 'blog_charset' ) );
 			return 'fail';
 		}		
 	}
