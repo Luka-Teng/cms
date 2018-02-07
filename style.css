@@ -9,8 +9,8 @@ a {
 	text-decoration: none !important;
 }
 h6.size-full {
-	width: 100%;
-	height:auto;
+	width: 100% !important;
+	height:auto !important;
 }
 /*general*/
 .width-100 {
