@@ -25,7 +25,7 @@
 				<?php foreach ($result as $applicant) { ?>
 					<tr>
 						<td><?php echo $applicant->uid ?></td>
-						<td><?php echo $applicant->type === 'media' ? '媒体' : '观众' ?></td>
+						<td><?php echo $applicant->type === 'media' ? '媒体' : '个人观众' ?></td>
 						<td><?php echo $applicant->name ?></td>
 						<td><?php echo $applicant->email ?></td>
 						<td><?php echo $applicant->company ?></td>

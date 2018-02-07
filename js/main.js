@@ -396,10 +396,10 @@ jQuery(document).ready(function($) {
 	})
 	//创建媒体申请人
 	$(function () {
-		$("#create_media_applicant").click(function () {
+		$("#create_media_applicant").click(function (e) {
+			e.preventDefault()
 			showLoading ()
 			var url = magicalData.siteURL + '/wp-json/apis/create_applicant'
-			var payment_type = 'free'
 			$.ajax({
 				type: 'post',
 				url: url,
@@ -410,13 +410,16 @@ jQuery(document).ready(function($) {
 					company: $("#company").val(),
 					job: $("#job").val(),
 					phone: $("#phone").val(),
-					type: 'media',
-					payment_type: payment_type,
-					total_amount: '200.00'
+					type: $("#type").val(),
+					payment_type: $("#payment_type").val(),
+					total_amount: '0'
 				},
 			    success: function (data) {
 			    	console.log(data)
 					showflash('创建成功', 'success')
+					if ($("#payment_type").val() === 'free') {
+						refreshLoading ()
+					}
 					payment_type === 'free' ? refreshLoading () : $("body").append(data)									
 			    },
 			    error: function (data) {

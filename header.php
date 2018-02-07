@@ -63,7 +63,23 @@
 								<?php if ($loop_num % 2 === 0) { echo '</div>'; } ?>	
 								<?php $loop_num++ ?>
 							<?php } ?>
-							<?php if (count($all_posts) % 2 === 1) { echo '</div>'; } ?>
+							<?php #观众中心需要增加一个注册页面 ?>
+							<?php if ($cat->category_nicename === 'audience-center') { ?>
+								<?php if ($loop_num % 2 === 1) { echo '<div class="row">'; } ?>									
+									<div class="col-sm-6 sub-menu-item">
+										<a href="/client-register">观众注册</a>
+									</div>
+								</div>	
+							<?php #媒体中心需要增加一个注册页面 ?>
+							<?php } elseif ($cat->category_nicename === 'media-center') { ?>
+								<?php if ($loop_num % 2 === 1) { echo '<div class="row">'; } ?>									
+									<div class="col-sm-6 sub-menu-item">
+										<a href="/client-register">媒体注册</a>
+									</div>
+								</div>	
+							<?php } else { ?>
+								<?php if (count($all_posts) % 2 === 1) { echo '</div>'; } ?>
+							<?php } ?>
 						</div>
 					</li>
 				<?php } ?>
@@ -83,7 +99,6 @@
 	</header>
 	<nav class="mobile-nav-container">
 		<ul>
-			<?php $categories = get_all_categories(); ?>
 			<?php foreach($categories as $cat) { ?>
 				<li>
 					<div class="nav-first"><?php echo $cat->name ?></div>
@@ -94,15 +109,26 @@
 								<div class="nav-second"><a href="<?php echo get_the_permalink($single_post->ID) ?>"><?php echo $single_post->post_title; ?></a></div>
 							</li>
 						<?php } ?>
+						<?php #观众中心需要增加一个注册页面 ?>
+						<?php if ($cat->category_nicename === 'audience-center') { ?>								
+							<li>
+								<div class="nav-second"><a href="/client-register">观众注册</a></div>
+							</li>
+						<?php #媒体中心需要增加一个注册页面 ?>
+						<?php } elseif ($cat->category_nicename === 'media-center') { ?>
+							<li>
+								<div class="nav-second"><a href="/client-register">媒体注册</a></div>
+							</li>							
+						<?php } ?>
 					</ul>
 				</li>
 			<?php } ?>
 		</ul>
 	</nav><!-- /site-header -->
+	
+	<div class="content-container">
 	<!--common tools-->
 	<?php get_template_part('common/loading', '') ?>
 	<?php get_template_part('common/error', '') ?>
 	<?php get_template_part('common/flash', '') ?>
 	<!--common tools-->
-	
-	<div class="content-container">

@@ -712,7 +712,7 @@
 						return alipay_pay($columns["email"], $columns["uid"], $columns["total_amount"], 'alipay_subject', 'alipay_body');
 					}	else if ($request["payment_type"] === 'free') {
 						//直接开始付款后的业务逻辑
-						return after_paid($columns["email"], $columns["uid"], 'FREE');
+						return after_paid($columns["email"], $columns["uid"], $columns["uid"]);
 					}
 				} else {
 					return new WP_Error( 'database error', '数据库出错', array('status' => '505') );

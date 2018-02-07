@@ -8,6 +8,10 @@ Version: 1.0
 a {
 	text-decoration: none !important;
 }
+h6.full-size {
+	width: 100%;
+	height:auto;
+}
 /*general*/
 .width-100 {
     width:100px !important;

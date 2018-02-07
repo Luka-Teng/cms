@@ -1,3 +1,4 @@
+	<div class="row" style="background-color: #1a2e46; height: 1.2rem;"></div>
 	<footer class="footer-container">
 		<div class="footer-wrapper">
 			<div>
@@ -48,6 +49,7 @@
 	</div>
 </div>
 <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
+<script src="<?php echo get_template_directory_uri() . '/js/validate.js' ?>"></script>
 <script src="<?php echo get_template_directory_uri() . '/lib/slick/slick.min.js' ?>"></script>
 <script src="<?php echo get_template_directory_uri() . '/js/header.js' ?>"></script>
 <script src="<?php echo get_template_directory_uri() . '/js/index.js' ?>"></script>
