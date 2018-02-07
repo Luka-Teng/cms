@@ -412,7 +412,7 @@ jQuery(document).ready(function($) {
 					phone: $("#phone").val(),
 					type: $("#type").val(),
 					payment_type: $("#payment_type").val(),
-					total_amount: '1'
+					total_amount: '1.00'
 				},
 			    success: function (data) {
 			    	console.log(data)
