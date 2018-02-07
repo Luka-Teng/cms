@@ -8,8 +8,8 @@ Version: 1.0
 a {
 	text-decoration: none !important;
 }
-h6>img.size-full {
-	width: 100% !important;
+img.size-full {
+	max-width: 100% !important;
 	height:auto !important;
 }
 /*general*/
