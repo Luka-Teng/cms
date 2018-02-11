@@ -24,9 +24,12 @@
 		</div>
 	</div>
 	<div class="side-block">
-		<a class="sidebar-block-title" data-toggle="collapse" href="#side-bar-3">申请人信息模块</a>
+		<a class="sidebar-block-title" data-toggle="collapse" href="#side-bar-3">其他信息模块</a>
 		<div class="collapse in sidebar-block-children" id="side-bar-3">
-			<a href="/admin-applicant">媒体申请人信息</a>
+			<a href="/admin-applicant">申请人信息</a>
+		</div>
+		<div class="collapse in sidebar-block-children" id="side-bar-3">
+			<a href="/admin-ticket">票务信息</a>
 		</div>
 	</div>				
 </div>

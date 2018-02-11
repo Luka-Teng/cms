@@ -64,32 +64,48 @@
 				</div>
 				<div class="form-group">
 					<label class="col-sm-2 control-label">参展日期&nbsp;<span style="color: #0076ff; line-height: 1.2rem; font-weight: bold;">*</span></label>
-					<div class="col-sm-10">
-						<div class="pc-show">
-							<button type="button" class="btn btn-choose" data-date="2017/08/17">2017/08/17 周三</button>
-							<button type="button" class="btn btn-choose" data-date="2017/08/18">2017/08/18 周四</button>
-							<button type="button" class="btn btn-choose" data-date="2017/08/19">2017/08/19 周五</button>
-						</div>
-						<div class="pc-show">
-							<button type="button" class="btn btn-choose" data-date="2017/08/20">2017/08/20 周六</button>
-							<button type="button" class="btn btn-choose" data-date="2017/08/21">2017/08/21 周日</button>
-							<button type="button" class="btn btn-choose" data-date="2017/08/22">2017/08/22 周一</button>
-						</div>
-						<div class="mobile-show">
-							<button type="button" class="btn btn-choose" data-date="2017/08/17">2017/08/17 周三</button>
-							<button type="button" class="btn btn-choose" data-date="2017/08/18">2017/08/18 周四</button>
-						</div>
-						<div class="mobile-show">
-							<button type="button" class="btn btn-choose" data-date="2017/08/19">2017/08/19 周五</button>
-							<button type="button" class="btn btn-choose" data-date="2017/08/20">2017/08/20 周六</button>
-						</div>
-						<div class="mobile-show">
-							<button type="button" class="btn btn-choose" data-date="2017/08/21">2017/08/21 周日</button>
-							<button type="button" class="btn btn-choose" data-date="2017/08/22">2017/08/22 周一</button>
-						</div>
-						<div>
-							<span style="color: #0076ff;">注：2017/08/19为媒体日不对公众开放敬请谅解，电子票将通过邮箱发送，请注意查收。</span>
-						</div>
+					<?php $result_media = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . 'ticket where type = "media"', OBJECT ) ?>
+					<?php $result_audience = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . 'ticket where type = "audience"', OBJECT ) ?>
+					<div class="col-sm-10 ticket-media" style="display:none">
+					
+						<?php $loop_num = 1; ?>
+						<?php foreach($result_media as $result) { ?>
+							<?php if ($loop_num % 3 == 1) { echo '<div class="pc-show">'; } ?>									
+								<button type="button" class="ticket-btn btn btn-choose" data-tickettype="media" data-ticketprice="<?php echo $result->price ?>" data-ticketdate="<?php echo $result->date ?>"><?php echo $result->date ?></button>
+							<?php if ($loop_num % 3 === 0) { echo '</div>'; } ?>	
+							<?php $loop_num++ ?>
+						<?php } ?>
+						<?php if (count($result_media) % 3 !== 0) { echo '</div>'; } ?>
+						
+						<?php $loop_num = 1; ?>
+						<?php foreach($result_media as $result) { ?>
+							<?php if ($loop_num % 2 == 1) { echo '<div class="mobile-show">'; } ?>									
+								<button type="button" class="ticket-btn btn btn-choose" data-tickettype="media" data-ticketprice="<?php echo $result->price ?>" data-ticketdate="<?php echo $result->date ?>"><?php echo $result->date ?></button>
+							<?php if ($loop_num % 2 === 0) { echo '</div>'; } ?>	
+							<?php $loop_num++ ?>
+						<?php } ?>
+						<?php if (count($result_media) % 2 !== 0) { echo '</div>'; } ?>
+						
+					</div>
+					<div class="col-sm-10 ticket-audience">
+					
+						<?php $loop_num = 1; ?>
+						<?php foreach($result_audience as $result) { ?>
+							<?php if ($loop_num % 3 == 1) { echo '<div class="pc-show">'; } ?>									
+								<button type="button" class="ticket-btn btn btn-choose" data-tickettype="audience" data-ticketprice="<?php echo $result->price ?>" data-ticketdate="<?php echo $result->date ?>"><?php echo $result->date ?></button>
+							<?php if ($loop_num % 3 === 0) { echo '</div>'; } ?>	
+							<?php $loop_num++ ?>
+						<?php } ?>
+						<?php if (count($result_audience) % 3 !== 0) { echo '</div>'; } ?>
+						
+						<?php $loop_num = 1; ?>
+						<?php foreach($result_audience as $result) { ?>
+							<?php if ($loop_num % 2 == 1) { echo '<div class="mobile-show">'; } ?>									
+								<button type="button" class="ticket-btn btn btn-choose" data-tickettype="audience" data-ticketprice="<?php echo $result->price ?>" data-ticketdate="<?php echo $result->date ?>"><?php echo $result->date ?></button>
+							<?php if ($loop_num % 2 === 0) { echo '</div>'; } ?>	
+							<?php $loop_num++ ?>
+						<?php } ?>
+						<?php if (count($result_audience) % 2 !== 0) { echo '</div>'; } ?>
 					</div>
 				</div>
 				<div class="form-group">
@@ -111,4 +127,17 @@
 		</div>
 	</div>
 </section>
+<script>
+	jQuery('#type').change(function () {
+		var value = jQuery(this).val()
+		$(".ticket-btn").removeClass("btn-active")
+		if (value === 'media') {
+			jQuery(".ticket-media").show()
+			jQuery(".ticket-audience").hide()
+		} else if (value === 'audience') {
+			jQuery(".ticket-media").hide()
+			jQuery(".ticket-audience").show()
+		}
+	})
+</script>
 <?php get_footer(); ?>

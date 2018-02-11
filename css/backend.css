@@ -31,6 +31,9 @@
 	max-width: 100%;
     color: #444;
 }
+.general-padding {
+	padding:15px;
+}
 /*grid*/
 .col-1 {
 	width: 8.33%;

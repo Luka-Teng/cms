@@ -117,6 +117,7 @@
 	define('EMAIL_VERIFICATION_TABLE', $wpdb->prefix . 'email_verification');
 	define('APPLICANT_TABLE', $wpdb->prefix . 'applicant');
 	define('BANNER_TABLE', $wpdb->prefix . 'banner');
+	define('TICKET_TABLE', $wpdb->prefix . 'ticket');
 	// 插件激活时，运行回调方法创建数据表, 在WP原有的options表中插入插件版本号
 	add_action('after_switch_theme', 'initdb');
 	function initdb() {
@@ -159,11 +160,25 @@
 				phone varchar(20) NOT NULL,
 				type varchar(20) NOT NULL,
 				payment_status varchar(20) NOT NULL DEFAULT 'unpaid',
-				total_amount varchar(20) NOT NULL DEFAULT '0',
+				total_amount varchar(20) NOT NULL DEFAULT '0.00',
+				tickets varchar(1000) DEFAULT '[]',
 		        UNIQUE KEY id (id)
 		    ) $charset_collate;";
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		    dbDelta( $sql2 );
+	    }
+		//创建票务数据库
+	    if ($wpdb->get_var('show tables like "' . TICKET_TABLE . '"') !== TICKET_TABLE) {
+	    	$sql5 = "CREATE TABLE " . TICKET_TABLE . " (
+		        id mediumint(9) NOT NULL AUTO_INCREMENT,
+				uid varchar(50) NOT NULL UNIQUE,
+				date varchar(20) NOT NULL,
+				type varchar(20) NOT NULL,
+				price varchar(20) NOT NULL DEFAULT '0.00',
+		        UNIQUE KEY id (id)
+		    ) $charset_collate;";
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		    dbDelta( $sql5 );
 	    }
 	    //创建轮播图数据库
 	    if ($wpdb->get_var('show tables like "' . CAROUSEL_TABLE . '"') !== CAROUSEL_TABLE) {
@@ -189,7 +204,7 @@
 			dbDelta( $sql3_6 );
 	    }
 		//创建BANNER数据库
-	    if ($wpdb->get_var('show tables like "' . BANNER_TABLE . '"') !== CAROUSEL_TABLE) {
+	    if ($wpdb->get_var('show tables like "' . BANNER_TABLE . '"') !== BANNER_TABLE) {
 	    	$sql4_1 = "CREATE TABLE " . BANNER_TABLE . " (
 		        id mediumint(9) NOT NULL AUTO_INCREMENT,
 		        time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -262,6 +277,90 @@
         	'status' => 'success',
         	'message' => $user
         );
+	}
+	
+	/******************************************************/
+	
+	//定义ticket模块
+	
+	//创建票的路由
+	add_action( 'rest_api_init', 'new_ticket_hook' );
+	function new_ticket_hook() {
+		register_rest_route(
+			'apis', 'new_ticket',
+			array(
+				'methods'  => 'POST',
+				'callback' => 'new_ticket',
+				'permission_callback' => function () {
+					return isAdministrator();
+				},
+				'args' => array(
+				  'type' => array(
+					'validate_callback' => function ($param) {
+						//付款类型可以是免费，支付宝，微信
+						return isInArray($param, ['media', 'audience']);
+					}
+				  ),
+				  'price' => array(
+					'validate_callback' => function ($param) {
+						return isNumber($param);
+					}
+				  ),
+				  'date' => array(
+					'validate_callback' => function ($param) {
+						return isNotNull($param);
+					}
+				  )
+				)
+			)
+		);
+	}
+	function new_ticket($request) {
+		global $wpdb;
+		$columns['date'] = $request['date'];
+		$columns['type'] = $request['type'];
+		$columns['price'] = $request['price'];
+		$columns['uid'] = $request['type'] . '_' . $request['date'];
+		$sql = $wpdb->insert( 
+			TICKET_TABLE, 
+			$columns
+		);
+		if ($sql) {
+			return array(
+				'status' => '200',
+				'message' => 'success'
+			);
+		} else {
+			return new WP_Error( 'database error', 'database error', array('status' => '505') );
+		}
+	}
+	
+	//删除票的路由
+	add_action( 'rest_api_init', 'delete_ticket_hook' );
+	function delete_ticket_hook() {
+		register_rest_route(
+			'apis', 'delete_ticket',
+			array(
+				'methods'  => 'DELETE',
+				'callback' => 'delete_ticket',
+				'permission_callback' => function () {
+					return isAdministrator();
+				}
+			)
+		);
+	}
+	function delete_ticket($request) {
+		global $wpdb;
+		$columns['uid'] = $request['uid'];
+		$sql = $wpdb->delete(TICKET_TABLE, $columns);
+		if ($sql) {
+			return array(
+				'status' => '200',
+				'message' => 'success'
+			);
+		} else {
+			return new WP_Error( 'database error', 'database error', array('status' => '505') );
+		}
 	}
 	
 	/******************************************************/
@@ -462,6 +561,25 @@
 			return false;
 		}
 	}
+	//是否是数字
+	function isNumber($value) {
+		$pattern = "/^(\d+)|(\d+.\d+)$/i";
+		if ( preg_match( $pattern, $value ) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	//是否是日期
+	function isDate($value) {
+		//目前支持yyyy-mm-dd, yyyy/mm/dd
+		$pattern = "/^\d{4}(-|\/)\d{2}(-|\/)\d{2}$/i";
+		if ( preg_match( $pattern, $value ) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	//是否是电话
 	function isPhone($value) {
 		$pattern = "/^1[0-9]{10}$/i";
@@ -599,6 +717,11 @@
 						return isNotNull($param);
 					}
 				  ),
+				  'tickets' => array(
+					'validate_callback' => function ($param) {
+						return count(json_decode($param)) !== 0;
+					}
+				  ),
 				  'type' => array(
 					'validate_callback' => function ($param) {
 						return isInArray($param, ['audience', 'media']);
@@ -676,6 +799,19 @@
 		if ($result) {
 			#判断该邮箱是否注册，或者该注册邮箱是否unpaid
 			global $wpdb;
+			//查询票价
+			$tickets = $wpdb->get_results( 'SELECT * FROM ' . TICKET_TABLE, OBJECT );
+			$columns["total_amount"] = 0.00;
+			if ($tickets) {
+				foreach ($tickets as $ticket) {
+					if (in_array($ticket->uid, json_decode($request["tickets"]))) {
+						$columns["total_amount"] +=  number_format($ticket->price, 2, '.', '');
+					}
+				}
+			} else {
+				return new WP_Error( 'database error', '数据库出错', array('status' => '505') );
+			}
+			
 			$applicant = $wpdb->get_row( "SELECT * FROM " . APPLICANT_TABLE . " WHERE email = '{$request["email"]}' ", OBJECT );
 			if ($applicant && $applicant->payment_status === 'paid') {
 				#如果用户已付款，直接输出错误
@@ -684,7 +820,7 @@
 				#如果用户以创建，但是未付款，直接发起付款请求
 				if ($request["payment_type"] === 'alipay') {
 					//发起支付宝请求
-					return alipay_pay($applicant->email, $applicant->uid, $request["total_amount"], 'alipay_subject', 'alipay_body');
+					return alipay_pay($applicant->email, $applicant->uid, $columns["total_amount"], 'alipay_subject', 'alipay_body');
 				}	else if ($request["payment_type"] === 'free') {	
 					//直接开始付款后的业务逻辑
 					return after_paid($applicant->email, $applicant->uid, 'FREE');
@@ -698,8 +834,8 @@
 				$columns["job"] = $request["job"];
 				$columns["phone"] = $request["phone"];
 				$columns["type"] = $request["type"];
-				$columns["total_amount"] = $request["total_amount"];				
-				global $wpdb;	
+				$columns["tickets"] = $request["tickets"];			
+				
 				//插入新用户，状态为unpaid			
 				$ts1 = $wpdb->insert( 
 					APPLICANT_TABLE, 

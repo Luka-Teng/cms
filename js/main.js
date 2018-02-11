@@ -400,6 +400,18 @@ jQuery(document).ready(function($) {
 			e.preventDefault()
 			showLoading ()
 			var url = magicalData.siteURL + '/wp-json/apis/create_applicant'
+			var tickets = []
+			var total_amount = 0.00
+			$(".ticket-btn")
+			.filter(function () {
+				return $(this).hasClass("btn-active")
+			})
+			.each(function () {			
+				tickets.push($(this).data("tickettype") + "_" + $(this).data("ticketdate"))
+				total_amount += parseFloat($(this).data("ticketprice"))
+			})
+			//这个是用来前台呈现的
+			total_amount = parseFloat(total_amount).toFixed(2)
 			$.ajax({
 				type: 'post',
 				url: url,
@@ -412,13 +424,14 @@ jQuery(document).ready(function($) {
 					phone: $("#phone").val(),
 					type: $("#type").val(),
 					payment_type: $("#payment_type").val(),
-					total_amount: '1.00'
+					tickets: JSON.stringify(tickets)
 				},
 			    success: function (data) {
 			    	console.log(data)
 					showflash('创建成功', 'success')
 					if ($("#payment_type").val() === 'free') {
 						refreshLoading ()
+						window.location.href = '/return-url'
 					}
 					payment_type === 'free' ? refreshLoading () : $("body").append(data)									
 			    },
@@ -426,6 +439,66 @@ jQuery(document).ready(function($) {
 					refreshLoading ()
 			    	showError(data)
 					showflash('创建失败', 'error')
+			    }
+			})
+		})
+	})
+	
+	//创建票务
+	$(function () {
+		$("#new-ticket").click(function (e) {
+			showLoading ()
+			var url = magicalData.siteURL + '/wp-json/apis/new_ticket'
+			$.ajax({
+				type: 'post',
+				url: url,
+				data: {
+					date: $("#date").val(),
+					type: $("#type").val(),
+					price: parseFloat($("#price").val()).toFixed(2),
+				},
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
+				},
+			    success: function (data) {
+			    	console.log(data)
+					showflash('创建成功', 'success')
+					location.reload()
+					refreshLoading ()								
+			    },
+			    error: function (data) {
+					refreshLoading ()
+			    	showError(data)
+					showflash('创建失败', 'error')
+			    }
+			})
+		})
+	})
+	
+	//删除票务
+	$(function () {
+		$(".del-ticket").click(function (e) {
+			showLoading ()
+			var url = magicalData.siteURL + '/wp-json/apis/delete_ticket'
+			$.ajax({
+				type: 'delete',
+				url: url,
+				data: {
+					uid: $(this).data("ticket"),
+				},
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
+				},
+			    success: function (data) {
+			    	console.log(data)
+					showflash('删除成功', 'success')
+					location.reload()
+					refreshLoading ()								
+			    },
+			    error: function (data) {
+					refreshLoading ()
+			    	showError(data)
+					showflash('删除失败', 'error')
 			    }
 			})
 		})
