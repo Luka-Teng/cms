@@ -1,12 +1,40 @@
 <?php get_header(); ?>
+<style>
+.pc-show{
+    display: block;
+}
+.mobile-show{
+    display: none;
+}
+@media screen and (max-width: 768px) {
+    .pc-show{
+        display: none;
+    }
+    .mobile-show{
+        display: block;
+    }
+}
+</style>
 <!--轮播图-->
-<section class="row img-container">
+<section class="row img-container pc-show">
 	<div class="slider-wrapper">
 		<?php $carousels = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . 'carousel', OBJECT ) ?>
 		<?php for ($i = 0; $i < count($carousels); $i++) { ?>
 			<?php if ($carousels[$i]->url_1 !== '/') : ?>
 			<div class="slider">
 				<img class="slider-img" src="<?php echo $carousels[$i]->url_1?>">
+				<img class="slider-text" src="<?php echo get_static_url('/img/slider-text.png') ?>">
+			</div>
+			<?php endif ?>
+		<?php } ?>		
+	</div>
+</section>
+<section class="row img-container mobile-show">
+	<div class="slider-wrapper">
+		<?php for ($i = 0; $i < count($carousels); $i++) { ?>
+			<?php if ($carousels[$i]->url_2 !== '/') : ?>
+			<div class="slider">
+				<img class="slider-img" src="<?php echo $carousels[$i]->url_2?>">
 				<img class="slider-text" src="<?php echo get_static_url('/img/slider-text.png') ?>">
 			</div>
 			<?php endif ?>

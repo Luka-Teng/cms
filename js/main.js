@@ -40,17 +40,40 @@ jQuery(document).ready(function($) {
 		})
 	}
 
+	//promise factory
+	function genPromise(fn) {
+		return new Promise(function (res, rej) {
+			fn(res, rej)
+		})
+	}
+	
+	//check the image width and height
+	function checkSize(file_input, width, height) {
+		return genPromise(function (res, rej) {
+			const fileReader = new FileReader()
+			fileReader.addEventListener('load', () => {
+				var img = new Image()
+				img.src = fileReader.result
+				img.onload = function () {
+					if (img.width !== width || img.height !== height) {
+						alert('请务必使用'+ width +'px X '+ height +'px图片否则将造成显示错误！')
+						rej("failed")
+					} else {
+						res("success")
+					}
+				}
+			})
+			fileReader.readAsDataURL(file_input.files[0])
+		})
+	} 
+	
 	//show images when uploading files
-	function onFilePicked(file, target) {
-		let filename = file.name
-		if (filename.lastIndexOf('.') <= 0) {
-		  return alert('Please add a valid file!')
-		}
+	function onFilePicked(file_input, target) {
 		const fileReader = new FileReader()
 		fileReader.addEventListener('load', () => {
 		  target.src = fileReader.result
 		})
-		fileReader.readAsDataURL(file)
+		fileReader.readAsDataURL(file_input.files[0])
 	}
 	
 	//init
@@ -64,18 +87,59 @@ jQuery(document).ready(function($) {
 		//轮播图上传图片显示
 		[1,2,3,4,5].forEach(function (element) {
 			$('#carousel_' + element + '_1').change(function (event) {
-				onFilePicked(event.target.files[0], document.getElementById('carousel-target-' + element + '-1'))
+				checkSize(event.target, 1920, 765)
+				.then(function () {
+					onFilePicked(event.target, document.getElementById('carousel-target-' + element + '-1'))
+				})
+				.catch(function () {
+					event.target.value = ''
+				})			
 			})
 			$('#carousel_' + element + '_2').change(function (event) {
-				onFilePicked(event.target.files[0], document.getElementById('carousel-target-' + element + '-2'))
+				checkSize(event.target, 1920, 765)
+				.then(function () {
+					onFilePicked(event.target, document.getElementById('carousel-target-' + element + '-2'))
+				})
+				.catch(function () {
+					event.target.value = ''
+				})	
 			}) 			
 		});
 		
 		//banner上传图片显示
 		[1,2,3,4,5,6,7,8].forEach(function (element) {
-			$('#banner_' + element).change(function (event) {
-				onFilePicked(event.target.files[0], document.getElementById('banner-target-' + element))
-			})		
+			if ([1,2,3,4].indexOf(element) >= 0) {
+				$('#banner_' + element).change(function (event) {
+					checkSize(event.target, 720, 505)
+					.then(function () {
+						console.log(111)
+						onFilePicked(event.target, document.getElementById('banner-target-' + element))
+					})
+					.catch(function () {
+						event.target.value = ''
+					})	
+				})	
+			} else if ([5,6,7].indexOf(element) >= 0){
+				$('#banner_' + element).change(function (event) {
+					checkSize(event.target, 720, 643)
+					.then(function () {
+						onFilePicked(event.target, document.getElementById('banner-target-' + element))
+					})
+					.catch(function () {
+						event.target.value = ''
+					})
+				})
+			} else {
+				$('#banner_' + element).change(function (event) {
+					checkSize(event.target, 1170, 332)
+					.then(function () {
+						onFilePicked(event.target, document.getElementById('banner-target-' + element))
+					})
+					.catch(function () {
+						event.target.value = ''
+					})
+				})
+			}				
 		})
 	})
 	

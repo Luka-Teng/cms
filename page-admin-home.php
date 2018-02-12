@@ -6,7 +6,7 @@
 			<div class="title top-gap-1 bot-gap-1">BANNER<?php echo $i ?></div>
 			<div class="admin-block">
 				<a class="file btn btn-default <?php echo $i > 4 ? 'width-100' : '' ?>">
-					<input type='file' name="banner_<?php echo $i ?>" id='banner_<?php echo $i ?>'>
+					<input type='file' accept="image/*" name="banner_<?php echo $i ?>" id='banner_<?php echo $i ?>'>
 					上传
 				</a>
 				<a class="btn btn-info left-gap-1 <?php echo $i > 4 ? 'width-100' : '' ?> banner-upload-btn" data-banner="banner_<?php echo $i ?>">提交</a>
@@ -25,7 +25,7 @@
 		<div class="title top-gap-1 bot-gap-1">BRAND品牌</div>
 		<div class="admin-block text-center">
 			<a class="file btn btn-default width-100">
-				<input type='file' name="banner_<?php echo count($result) ?>" id='banner_<?php echo count($result) ?>'>
+				<input type='file' accept="image/*" name="banner_<?php echo count($result) ?>" id='banner_<?php echo count($result) ?>'>
 				上传
 			</a>
 			<a class="btn btn-info left-gap-1 width-100 banner-upload-btn" data-banner="banner_<?php echo count($result) ?>">提交</a>

@@ -6,7 +6,7 @@
 			<div class="title top-gap-1 bot-gap-1" style="margin-left:4%">轮播图<?php echo $i ?></div>
 			<div class="admin-block col-5 pull-left" style="margin-left:4.165%">
 				<a class="file btn btn-default width-100">
-					<input type='file' name="carousel_<?php echo $i ?>_1" id='carousel_<?php echo $i ?>_1'>
+					<input type='file' accept="image/*" name="carousel_<?php echo $i ?>_1" id='carousel_<?php echo $i ?>_1'>
 					上传
 				</a>
 				<a class="btn btn-info width-100 left-gap-1 carousel-upload-btn" data-carousel="carousel_<?php echo $i ?>_1">提交</a>
@@ -18,7 +18,7 @@
 			</div>
 			<div class="admin-block col-5 pull-left" style="margin-left:8.33%">
 				<a class="file btn btn-default width-100">
-					<input type='file' name="carousel_<?php echo $i ?>_2" id='carousel_<?php echo $i ?>_2'>
+					<input type='file' accept="image/*" name="carousel_<?php echo $i ?>_2" id='carousel_<?php echo $i ?>_2'>
 					上传
 				</a>
 				<a class="btn btn-info width-100 left-gap-1 carousel-upload-btn" data-carousel="carousel_<?php echo $i ?>_2">提交</a>
