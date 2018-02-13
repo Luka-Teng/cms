@@ -1,7 +1,6 @@
 <?php get_header('admin'); ?>
 <?php if (current_user_can( 'administrator' )) : ?>
 	<?php $result = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . 'carousel', OBJECT ) ?>
-	<?php echo json_encode(get_cities()) ?>
 	<?php for ($i = 1; $i <= count($result); $i++) { ?>
 		<div class="clearfix">
 			<div class="title top-gap-1 bot-gap-1" style="margin-left:4%">轮播图<?php echo $i ?></div>
