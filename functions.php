@@ -33,6 +33,7 @@
 			'taxonomy' => 'category',
 			'hide_empty' => false,
 			'include' => [2,3,4,5,6,7,8,9],
+			'slug' => ['home', 'about-show', 'show-center', 'audience-center', 'activity', 'media-center', 'service', 'contact-us'],
 			'orderby' => 'term_id',
 			'order' => 'ASC',
 		));
@@ -55,7 +56,7 @@
 		return get_categories(array(
 			'taxonomy' => 'category',
 			'hide_empty' => false,
-			'include' => [12]
+			'slug' => ['show-news']
 		));
 	}
 	
@@ -64,7 +65,7 @@
 		return get_categories(array(
 			'taxonomy' => 'category',
 			'hide_empty' => false,
-			'include' => [13]
+			'slug' => ['show-highlights']
 		));
 	}
 	
