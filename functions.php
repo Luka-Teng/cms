@@ -45,7 +45,11 @@
 		return get_categories(array(
 			'taxonomy' => 'category',
 			'hide_empty' => false,
-			'child_of' => 10,
+			'child_of' => get_categories(array(
+				'taxonomy' => 'category',
+				'hide_empty' => false,
+				'slug' => ['cities']
+			))[0]->cat_ID,
 			'number' => $data_per_page,
 			'offset' => $passed_data
 		));
