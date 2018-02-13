@@ -27,16 +27,47 @@
 		}
 		return $false_value;
 	}
-	//show all categories
+	//show all categories, 8个主要标题， 注意id顺序
 	function get_all_categories () {
 		return get_categories(array(
 			'taxonomy' => 'category',
 			'hide_empty' => false,
-			'exclude' => 1,
+			'include' => [2,3,4,5,6,7,8,9],
 			'orderby' => 'term_id',
-			'order' => 'ASC'
+			'order' => 'ASC',
 		));
 	}
+	
+	//show categories in cities, 城市之窗
+	function get_cities ($paged = 1, $data_per_page = 100) {
+		$passed_data = ($paged - 1) * $data_per_page;
+		return get_categories(array(
+			'taxonomy' => 'category',
+			'hide_empty' => false,
+			'child_of' => 10,
+			'number' => $data_per_page,
+			'offset' => $passed_data
+		));
+	}
+	
+	//show categories, 展商动态
+	function get_show_news () {
+		return get_categories(array(
+			'taxonomy' => 'category',
+			'hide_empty' => false,
+			'include' => [12]
+		));
+	}
+	
+	//show categories, 	会展亮点
+	function get_show_highlights () {
+		return get_categories(array(
+			'taxonomy' => 'category',
+			'hide_empty' => false,
+			'include' => [13]
+		));
+	}
+	
 	//get static resources url
 	function get_static_url($string) {
 		return get_template_directory_uri() . $string;

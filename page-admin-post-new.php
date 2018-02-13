@@ -4,26 +4,12 @@
 		$cat_id = $_GET['cat_id'];
 	?>
 	<div class="form">
+		<div class="title top-gap-1 bot-gap-1 left-gap-1"><?php echo get_category($cat_id)->name ?></div>
 		<div class="form-item">
 			<p class="form-item-title">Title</p>
 			<input class="form-control required" name="title" id="title">
 		</div>
-		<div class="form-divider"></div>
-		<div class="form-item">
-			<p class="form-item-title">Category</p>
-			<select class="form-control" name="category" id="category">
-				<?php 
-					$categories = get_all_categories();
-					foreach ($categories as $cat) {
-				?>
-					<option value="<?php echo $cat->term_id ?>"
-						<?php if ($cat->term_id == $cat_id) {
-							echo "selected";
-						} ?>
-					><?php echo $cat->name ?></option>
-				<?php } ?>
-			</select>
-		</div>
+		<input hidden name="category" id="category" value="<?php echo $cat_id ?>">
 		<div class="form-divider"></div>
 		<div class="form-item top-gap-1">
 			<p class="form-item-title">Content</p>

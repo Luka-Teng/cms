@@ -12,6 +12,15 @@
 			<?php foreach($categories as $cat) { ?>
 				<a href="/admin-post-show?cat_id=<?php echo $cat->term_id ?>"><?php echo $cat->name ?></a>
 			<?php } ?>
+			<?php $categories = get_show_news(); ?>
+			<?php foreach($categories as $cat) { ?>
+				<a href="/admin-post-show?cat_id=<?php echo $cat->term_id ?>"><?php echo $cat->name ?></a>
+			<?php } ?>
+			<?php $categories = get_show_highlights(); ?>
+			<?php foreach($categories as $cat) { ?>
+				<a href="/admin-post-show?cat_id=<?php echo $cat->term_id ?>"><?php echo $cat->name ?></a>
+			<?php } ?>
+			<a href="/admin-post-index">城市之窗</a>
 		</div>
 	</div>
 	<div class="side-block">

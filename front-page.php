@@ -95,7 +95,7 @@
 			<div class="news-zone-content">
 				<ul>
 					<?php $left_posts = get_posts(array(
-						'category_name' => 'activity',
+						'category_name' => 'show-news',
 						'numberposts' => 8
 					)); ?>
 					<?php for ($i = 0; $i < count($left_posts); $i++) { ?>
@@ -115,7 +115,7 @@
 			<div class="news-zone-content">
 				<ul>
 					<?php $right_posts = get_posts(array(
-						'category_name' => 'show-center',
+						'category_name' => 'show-highlights',
 						'numberposts' => 8
 					)); ?>
 					<?php for ($i = 0; $i < count($right_posts); $i++) { ?>

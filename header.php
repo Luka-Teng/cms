@@ -53,33 +53,43 @@
 							<a href="/" class="menu-item-label"><?php echo $cat->name ?></a>
 						</span>
 						<div class="sub-menu">
-							<?php $all_posts = get_posts(array('category' => $cat->term_id)); ?>
-							<?php $loop_num = 1; ?>
-							<?php foreach($all_posts as $single_post) { ?>
-								<?php if ($loop_num % 2 === 1) { echo '<div class="row">'; } ?>									
+							<div class="row">
+							
+								<?php #首页需要添加城市之窗， 展商动态， 展会亮点 ?>
+								<?php  if ($cat->category_nicename === 'home') { ?>								
+									<div class="col-sm-6 sub-menu-item">
+										<a href="/cities">城市之窗</a>
+									</div>
+									<div class="col-sm-6 sub-menu-item">
+										<a href="/show-news">展商动态</a>
+									</div>
+									<div class="col-sm-6 sub-menu-item">
+										<a href="/show-highlights">展会亮点</a>
+									</div>
+								<?php } ?>
+								
+								<?php $all_posts = get_posts(array('category' => $cat->term_id)); ?>
+								<?php foreach($all_posts as $single_post) { ?>								
 									<div class="col-sm-6 sub-menu-item">
 										<a href="<?php echo get_the_permalink($single_post->ID) ?>"><?php echo $single_post->post_title; ?></a>
 									</div>
-								<?php if ($loop_num % 2 === 0) { echo '</div>'; } ?>	
-								<?php $loop_num++ ?>
-							<?php } ?>
-							<?php #观众中心需要增加一个注册页面 ?>
-							<?php if ($cat->category_nicename === 'audience-center') { ?>
-								<?php if ($loop_num % 2 === 1) { echo '<div class="row">'; } ?>									
+								<?php } ?>
+								
+								<?php #观众中心需要增加一个注册页面 ?>
+								<?php  if ($cat->category_nicename === 'audience-center') { ?>								
 									<div class="col-sm-6 sub-menu-item">
 										<a href="/client-register">观众注册</a>
 									</div>
-								</div>	
-							<?php #媒体中心需要增加一个注册页面 ?>
-							<?php } elseif ($cat->category_nicename === 'media-center') { ?>
-								<?php if ($loop_num % 2 === 1) { echo '<div class="row">'; } ?>									
+								<?php } ?>
+								
+								<?php #媒体中心需要增加一个注册页面 ?>
+								<?php if ($cat->category_nicename === 'media-center') { ?>								
 									<div class="col-sm-6 sub-menu-item">
 										<a href="/client-register">媒体注册</a>
 									</div>
-								</div>	
-							<?php } else { ?>
-								<?php if (count($all_posts) % 2 === 1) { echo '</div>'; } ?>
-							<?php } ?>
+								<?php } ?>
+								
+							</div>
 						</div>
 					</li>
 				<?php } ?>
