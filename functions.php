@@ -27,12 +27,11 @@
 		}
 		return $false_value;
 	}
-	//show all categories, 8个主要标题， 注意id顺序
+	//show all categories, 8个主要标题
 	function get_all_categories () {
 		return get_categories(array(
 			'taxonomy' => 'category',
 			'hide_empty' => false,
-			'include' => [2,3,4,5,6,7,8,9],
 			'slug' => ['home', 'about-show', 'show-center', 'audience-center', 'activity', 'media-center', 'service', 'contact-us'],
 			'orderby' => 'term_id',
 			'order' => 'ASC',
