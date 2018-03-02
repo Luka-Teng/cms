@@ -16,7 +16,7 @@
 					<?php $data_per_page = 10; ?>
 					<?php $cities = get_cities($paged, $data_per_page); ?>
 					<?php foreach($cities as $city) { ?>
-						<a href="/<?php echo $city->category_nicename?>"><?php echo $city->cat_name ?></a>
+						<a class="tmp-a" href="/<?php echo $city->category_nicename?>"><?php echo $city->cat_name ?></a>
 					<?php } ?>
 					<div class="posts-nav">
 						<?php 

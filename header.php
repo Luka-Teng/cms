@@ -10,6 +10,7 @@
 		<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/css/public.css' ?>" type="text/css" media="all">
 		<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/css/header.css' ?>" type="text/css" media="all">
 		<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/css/index.css' ?>" type="text/css" media="all">
+		<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/css/frontend.css' ?>" type="text/css" media="all">
 		<style>
 			html {
 				font-size: 12px;
