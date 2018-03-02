@@ -157,14 +157,14 @@ a.sidebar-block-title:hover, a.sidebar-block-title:focus {
 	box-shadow: 0 0 3px 0 rgba(0,0,0,0.4);
 	padding: 15px;
 }
-    .posts-nav{ font-size: 14px;
-        color:rgba(0,0,0,0.44);padding:10px 0}
-    .posts-nav .page-numbers{border-radius: 3px;border:1px solid rgba(0, 0, 0, 0.15);display: inline-block;
-        text-align: center;
-        width: 30px;line-height:30px;margin:0 5px;}
-    .posts-nav .page-numbers.current,.posts-nav .page-numbers:not(.dots):hover{ background: #3b5998;
-        border-color: #3b5998;color:#fff;}
-    .posts-nav .page-numbers.dots{border-color:rgba(0,0,0,0)}
+.posts-nav{ font-size: 14px;
+	color:rgba(0,0,0,0.44);padding:10px 0}
+.posts-nav .page-numbers{border-radius: 3px;border:1px solid rgba(0, 0, 0, 0.15);display: inline-block;
+	text-align: center;
+	width: 30px;line-height:30px;margin:0 5px;}
+.posts-nav .page-numbers.current,.posts-nav .page-numbers:not(.dots):hover{ background: #3b5998;
+	border-color: #3b5998;color:#fff;}
+.posts-nav .page-numbers.dots{border-color:rgba(0,0,0,0)}
 /*some*/
 .admin-block {
     padding: 20px;
