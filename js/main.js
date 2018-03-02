@@ -5,6 +5,7 @@ jQuery(document).ready(function($) {
 		$("#error")
 			.addClass("active")
 			.find('.error-content').html(msg)
+			.find('a').remove()
 	}
 	function refreshError () {
 		$("#error")
