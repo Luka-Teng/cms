@@ -97,7 +97,7 @@ jQuery(document).ready(function($) {
 				})			
 			})
 			$('#carousel_' + element + '_2').change(function (event) {
-				checkSize(event.target, 1920, 765)
+				checkSize(event.target, 1080, 1375)
 				.then(function () {
 					onFilePicked(event.target, document.getElementById('carousel-target-' + element + '-2'))
 				})
