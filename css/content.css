@@ -134,6 +134,9 @@
     .my-form {
         padding: 1rem 1rem;
     }
+	.my-form h2{
+        font-size:20px;
+    }
     .pc-show{
         display: none;
     }
