@@ -13,7 +13,7 @@
 			</div>
 			<h3>观众注册</h3>
 			<form class="form-horizontal my-form">
-				<h2 style="text-align: center; margin: 2.5rem 0;">首届中国长三角（上海）品牌博览会</h2>
+				<h2 style="text-align: center; margin: 2.5rem 0;">首届中国长三角（上海）<br>品牌博览会</h2>
 				<div class="form-group">
 					<label for="register-name" class="col-sm-2 control-label">姓名&nbsp;<span style="color: #0076ff; line-height: 1.2rem; font-weight: bold;">*</span></label>
 					<div class="col-sm-6">
