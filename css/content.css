@@ -137,6 +137,9 @@
 	.my-form h2{
         font-size: 20px;
     }
+	.my-form span.header-divider{
+        display: block;
+    }
     .pc-show{
         display: none;
     }
