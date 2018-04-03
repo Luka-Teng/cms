@@ -120,6 +120,21 @@
 								<div class="nav-second"><a href="<?php echo get_the_permalink($single_post->ID) ?>"><?php echo $single_post->post_title; ?></a></div>
 							</li>
 						<?php } ?>
+						<?php #首页需要添加城市之窗， 展商动态， 展会亮点 ?>
+						<?php  if ($cat->category_nicename === 'home') { ?>
+							<li>
+								<div class="nav-second"><a href="/">首页</a></div>
+							</li>
+							<li>
+								<div class="nav-second"><a href="/cities">城市之窗</a></div>
+							</li>
+							<li>
+								<div class="nav-second"><a href="/show-news">展商动态</a></div>
+							</li>
+							<li>
+								<div class="nav-second"><a href="/show-highlights">展会亮点</a></div>
+							</li>
+						<?php } ?>
 						<?php #观众中心需要增加一个注册页面 ?>
 						<?php if ($cat->category_nicename === 'audience-center') { ?>								
 							<li>
