@@ -6,6 +6,15 @@
 .mobile-show{
     display: none;
 }
+.slick-slide img {
+    width: 100%;
+}
+.slider {
+    height: auto;
+}
+.slider-wrapper {
+    height: auto;
+}
 @media screen and (max-width: 768px) {
     .pc-show{
         display: none;
@@ -23,7 +32,6 @@
 			<?php if ($carousels[$i]->url_1 !== '/') : ?>
 			<div class="slider">
 				<img class="slider-img" src="<?php echo $carousels[$i]->url_1?>">
-				<img class="slider-text" src="<?php echo get_static_url('/img/slider-text.png') ?>">
 			</div>
 			<?php endif ?>
 		<?php } ?>		
@@ -35,7 +43,6 @@
 			<?php if ($carousels[$i]->url_2 !== '/') : ?>
 			<div class="slider">
 				<img class="slider-img" src="<?php echo $carousels[$i]->url_2?>">
-				<img class="slider-text" src="<?php echo get_static_url('/img/slider-text.png') ?>">
 			</div>
 			<?php endif ?>
 		<?php } ?>		
