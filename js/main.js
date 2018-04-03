@@ -88,7 +88,7 @@ jQuery(document).ready(function($) {
 		//轮播图上传图片显示
 		[1,2,3,4,5].forEach(function (element) {
 			$('#carousel_' + element + '_1').change(function (event) {
-				checkSize(event.target, 1920, 765)
+				checkSize(event.target, 1920, 920)
 				.then(function () {
 					onFilePicked(event.target, document.getElementById('carousel-target-' + element + '-1'))
 				})
