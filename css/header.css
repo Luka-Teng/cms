@@ -126,7 +126,7 @@ body {
     text-align: center;
 }
 .menu-item:hover {
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 .item-label-wrapper {
     position: relative;
