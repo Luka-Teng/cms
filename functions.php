@@ -427,7 +427,7 @@
 				} else {
 					global $wpdb;
 					$dir_path = 'wp-content/themes/cms/upload';
-					$file_path = 'wp-content/themes/cms/upload/'.$_FILES[$banner_name]["name"];
+					$file_path = 'wp-content/themes/cms/upload/'.$banner_name.$_FILES[$banner_name]["name"];
 					if (!file_exists($dir_path)) {
 						mkdir($dir_path, 0700);
 					}
@@ -489,7 +489,7 @@
 			} else {
 				global $wpdb;
 				$dir_path = 'wp-content/themes/cms/upload';
-				$file_path = 'wp-content/themes/cms/upload/'.$_FILES[$name]["name"];
+				$file_path = 'wp-content/themes/cms/upload/'.$name.$_FILES[$name]["name"];
 				if (!file_exists($dir_path)) {
 					mkdir($dir_path, 0700);
 				}
