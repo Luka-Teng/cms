@@ -431,10 +431,8 @@
 					if (!file_exists($dir_path)) {
 						mkdir($dir_path, 0700);
 					}
-					if (!file_exists($file_path)) {
-						//先将名字转化为utf-8在保存，防止中文乱码
-						move_uploaded_file($_FILES[$banner_name]["tmp_name"], iconv('utf-8','gb2312',$file_path));
-					}
+					//先将名字转化为utf-8在保存，防止中文乱码
+					move_uploaded_file($_FILES[$banner_name]["tmp_name"], iconv('utf-8','gb2312',$file_path));
 					$sql = $wpdb->update(BANNER_TABLE, array('image_url' => $file_path, 'title' => $request['title'], 'link' => $request['link']), array('uid' => $uid));
 					if ($sql) {
 						return array(
@@ -495,10 +493,8 @@
 				if (!file_exists($dir_path)) {
 					mkdir($dir_path, 0700);
 				}
-				if (!file_exists($file_path)) {
-					//先将名字转化为utf-8在保存，防止中文乱码
-					move_uploaded_file($_FILES[$name]["tmp_name"], iconv('utf-8','gb2312',$file_path));
-				}
+				//先将名字转化为utf-8在保存，防止中文乱码
+				move_uploaded_file($_FILES[$name]["tmp_name"], iconv('utf-8','gb2312',$file_path));
 				$wpdb->update(CAROUSEL_TABLE, array('url_' . substr($name,-1) => $file_path), array('name' => substr($name, 0, 10)));
 				$wpdb->show_errors();
 				if ($wpdb->last_error) {

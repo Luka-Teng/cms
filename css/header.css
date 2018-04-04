@@ -17,6 +17,7 @@ body {
     left: 0;
     right: 0;
     z-index: 9999;
+	background: rgba(0,0,0,0.1)；
 }
 .header-row {
     height: 7.7rem;
