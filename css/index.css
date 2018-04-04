@@ -37,11 +37,11 @@
 /*最新动态*/
 .recent-container{
     padding: 1.8rem 0; 
-    background-color: #1a2e46;
+    background-color: #f8f8f8;
     overflow: hidden;
 }
 .title{
-    color: #fff;
+    color: #4a4a4a;
     width: 100rem;
     font-size: 3rem;
     margin: 0 auto 1.6rem auto;
