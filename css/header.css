@@ -168,7 +168,7 @@ body {
     left: 0;
     padding: 35px 20px;
     position: absolute;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.3);
 }
 .sub-menu-item{
     height: 55px;
