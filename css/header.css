@@ -22,7 +22,7 @@ body {
 .header-row {
     height: 7.7rem;
     padding: 1.8rem 2.3rem;
-    border-bottom: 1px solid #7E7E7E;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
     transition: all 0.3s ease-out;
 }
 /*站内搜索*/
@@ -75,7 +75,7 @@ body {
 
 .second-row{
     height: 60px;
-    border-bottom: 1px solid #7E7E7E;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
     padding: 0;
     /* background: #000;
     opacity: 0.3; */
