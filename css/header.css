@@ -87,6 +87,7 @@ body {
     height: 5.5rem;
     border: none;
     padding: 0.5rem 1.2rem;
+	background: rgba(0,0,0,0.5)
 }
 .header-always-small>.second-row,.header-small>.second-row {
     height: 41px;
