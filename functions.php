@@ -187,7 +187,7 @@
 		        id mediumint(9) NOT NULL AUTO_INCREMENT,
 				uid varchar(50) NOT NULL UNIQUE,
 				trade_no varchar(50) DEFAULT '' UNIQUE,
-				email varchar(30) NOT NULL DEFAULT '' UNIQUE, 
+				email varchar(30) NOT NULL DEFAULT '', 
 		        time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		        company varchar(55) DEFAULT '' NOT NULL,
 		        name varchar(20) NOT NULL,
@@ -197,6 +197,7 @@
 				payment_status varchar(20) NOT NULL DEFAULT 'unpaid',
 				total_amount varchar(20) NOT NULL DEFAULT '0.00',
 				tickets varchar(1000) DEFAULT '[]',
+				checked varchar(20) DEFAULT 'unchecked' NOT NULL,
 		        UNIQUE KEY id (id)
 		    ) $charset_collate;";
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -714,6 +715,54 @@
 		}
 	}
 	
+	//验证电话和验证码的匹配
+	function checkout_phone_code($phone, $code) {
+		require_once("utils/msg/msg.php");
+		$AppKey = '96690ef8af4213bfa978d47d465a247d';
+		$AppSecret = 'e5aa4487c2b2';
+		$p = new ServerAPI($AppKey,$AppSecret,'fsockopen');
+		$result = $p->verifySmsCode('15000900635', '151203');
+		if ($result['code'] == '200') {
+			return true;
+		}
+		return false;
+	}
+	
+	//创建电话验证码的接口
+	add_action( 'rest_api_init', 'phone_code_hook' );
+	function phone_code_hook() {
+		register_rest_route(
+			'apis', 'phone_code',
+			array(
+				'methods'  => 'POST',
+				'callback' => 'phone_code',
+				'args' => array(
+				  'phone' => array(
+					'validate_callback' => function ($param) {
+						return isPhone($param);
+					}
+				  )
+				)
+			)
+		);
+	}
+	function phone_code($request) {
+		require_once("utils/msg/msg.php");
+		$AppKey = '96690ef8af4213bfa978d47d465a247d';
+		$AppSecret = 'e5aa4487c2b2';
+		$p = new ServerAPI($AppKey,$AppSecret,'fsockopen');
+		$result = $p->sendSmsCode('3962603',$request['phone'],'','6');
+		if ($result['code'] == '200') {
+			return array(
+				'status' => '200',
+				'message' => 'success'
+			); 
+		} else {
+			return new WP_Error( 'phone sent error', '验证码无法发送', array('status' => '505') );
+		}
+	}
+	//todo发送短信模板
+	
 	//create a media applicant
 	add_action( 'rest_api_init', 'create_applicant_hook' );
 	function create_applicant_hook() {
@@ -826,8 +875,9 @@
 
 	function create_applicant($request){
 		//检查验证码是否正确
-		$result = checkout_email_code($request["email"], $request["email_code"]);
-		if ($result) {
+		$result1 = checkout_email_code($request["email"], $request["email_code"]);
+		$result2 = checkout_phone_code($request["phone"], $request["phone_code"]);
+		if ($result1 && $result2) {
 			#判断该邮箱是否注册，或者该注册邮箱是否unpaid
 			global $wpdb;
 			//查询票价
