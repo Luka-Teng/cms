@@ -57,9 +57,18 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="register-cellphone" class="col-sm-2 control-label">手机号&nbsp;</label>
-					<div class="col-sm-6">
+					<label for="register-cellphone" class="col-sm-2 control-label">手机号&nbsp;<span style="color: #0076ff; line-height: 1.2rem; font-weight: bold;">*</span></label>
+					<div class="col-sm-3">
 						<input name="phone" type="text" class="form-control input-erik" id="phone" placeholder="请输入手机号">
+					</div>
+					<div class="col-sm-3">
+						<button type="button" style="width: 100%;" id="get-phonecode-btn" class="btn btn-primary">获取验证码</button>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="register-code" class="col-sm-2 control-label">验证码&nbsp;<span style="color: #0076ff; line-height: 1.2rem; font-weight: bold;">*</span></label>
+					<div class="col-sm-6">
+						<input name="email_code" id="phone_code" type="text" class="form-control input-erik" placeholder="请输入获得的验证码">
 					</div>
 				</div>
 				<div class="form-group">

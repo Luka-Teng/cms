@@ -194,7 +194,7 @@
 				job varchar(20) NOT NULL,
 				phone varchar(20) NOT NULL,
 				type varchar(20) NOT NULL,
-				payment_status varchar(20) NOT NULL DEFAULT 'unpaid',
+				payment_type varchar(20) NOT NULL DEFAULT 'free',
 				total_amount varchar(20) NOT NULL DEFAULT '0.00',
 				tickets varchar(1000) DEFAULT '[]',
 				checked varchar(20) DEFAULT 'unchecked' NOT NULL,
@@ -333,7 +333,7 @@
 				'args' => array(
 				  'type' => array(
 					'validate_callback' => function ($param) {
-						//付款类型可以是免费，支付宝，微信
+						//类型可以是媒体，观众
 						return isInArray($param, ['media', 'audience']);
 					}
 				  ),
@@ -720,8 +720,8 @@
 		require_once("utils/msg/msg.php");
 		$AppKey = '96690ef8af4213bfa978d47d465a247d';
 		$AppSecret = 'e5aa4487c2b2';
-		$p = new ServerAPI($AppKey,$AppSecret,'fsockopen');
-		$result = $p->verifySmsCode('15000900635', '151203');
+		$p = new ServerAPI($AppKey,$AppSecret,'curl');
+		$result = $p->verifySmsCode($phone, $code);
 		if ($result['code'] == '200') {
 			return true;
 		}
@@ -750,7 +750,7 @@
 		require_once("utils/msg/msg.php");
 		$AppKey = '96690ef8af4213bfa978d47d465a247d';
 		$AppSecret = 'e5aa4487c2b2';
-		$p = new ServerAPI($AppKey,$AppSecret,'fsockopen');
+		$p = new ServerAPI($AppKey,$AppSecret,'curl');
 		$result = $p->sendSmsCode('3962603',$request['phone'],'','6');
 		if ($result['code'] == '200') {
 			return array(
@@ -819,22 +819,31 @@
 	}
 	
 	//付款后的业务逻辑代码
-	function after_paid($applicant_email, $applicant_uid, $trade_no) {
+	function after_paid($data) {
 		#免费请求， 直接修改paid数据
 		global $wpdb;
-		$query = $wpdb->update(
+		//如果用户未创建，创建用户，并发起请求
+		$columns["uid"] = $data["uid"];
+		$columns["email"] = $data["email"];
+		$columns["name"] = $data["name"];
+		$columns["company"] = $data["company"];
+		$columns["job"] = $data["job"];
+		$columns["phone"] = $data["phone"];
+		$columns["type"] = $data["type"];
+		$columns["tickets"] = $data["tickets"];
+		$columns["total_amount"] = $data["total_amount"];
+		$columns["payment_type"] = $data["payment_type"];
+		
+		//插入新用户，状态为unpaid			
+		$query = $wpdb->insert( 
 			APPLICANT_TABLE, 
-			array(
-				'payment_status' => 'paid',
-				'trade_no' => $trade_no
-			), 
-			array('email' => $applicant_email)
+			$columns
 		);
 		//如果数据库请求成功
 		if ($query) {
-			$code_html = generateBarcode($applicant_uid);
+			$code_html = generateBarcode($columns["uid"]);
 			$email_result = sendEmail(
-				$applicant_email,
+				$columns["email"],
 				"no-reply", 
 				"
 				<h1>这是您入场用的条形码。<h1>
@@ -883,6 +892,15 @@
 			//查询票价
 			$tickets = $wpdb->get_results( 'SELECT * FROM ' . TICKET_TABLE, OBJECT );
 			$columns["total_amount"] = 0.00;
+			$columns["uid"] = getOrderNo("ma");
+			$columns["email"] = $request["email"];
+			$columns["name"] = $request["name"];
+			$columns["company"] = $request["company"];
+			$columns["job"] = $request["job"];
+			$columns["phone"] = $request["phone"];
+			$columns["type"] = $request["type"];
+			$columns["tickets"] = $request["tickets"];
+			$columns["payment_type"] = $request["payment_type"];
 			if ($tickets) {
 				foreach ($tickets as $ticket) {
 					if (in_array($ticket->uid, json_decode($request["tickets"]))) {
@@ -892,48 +910,12 @@
 			} else {
 				return new WP_Error( 'database error', '数据库出错', array('status' => '505') );
 			}
-			
-			$applicant = $wpdb->get_row( "SELECT * FROM " . APPLICANT_TABLE . " WHERE email = '{$request["email"]}' ", OBJECT );
-			if ($applicant && $applicant->payment_status === 'paid') {
-				#如果用户已付款，直接输出错误
-				return new WP_Error( 'error', '该账号已付款', array('status' => '505') );
-			} else if ($applicant && $applicant->payment_status === 'unpaid') {
-				#如果用户以创建，但是未付款，直接发起付款请求
-				if ($request["payment_type"] === 'alipay') {
-					//发起支付宝请求
-					return alipay_pay($applicant->email, $applicant->uid, $columns["total_amount"], 'alipay_subject', 'alipay_body');
-				}	else if ($request["payment_type"] === 'free') {	
-					//直接开始付款后的业务逻辑
-					return after_paid($applicant->email, $applicant->uid, 'FREE');
-				}
-			} else {
-				//如果用户未创建，创建用户，并发起请求
-				$columns["uid"] = getOrderNo("ma");
-				$columns["email"] = $request["email"];
-				$columns["name"] = $request["name"];
-				$columns["company"] = $request["company"];
-				$columns["job"] = $request["job"];
-				$columns["phone"] = $request["phone"];
-				$columns["type"] = $request["type"];
-				$columns["tickets"] = $request["tickets"];			
-				
-				//插入新用户，状态为unpaid			
-				$ts1 = $wpdb->insert( 
-					APPLICANT_TABLE, 
-					$columns
-				);
-				if ($ts1) {
-					#发起支付请求
-					if ($request["payment_type"] === 'alipay') {
-						//发起支付宝请求
-						return alipay_pay($columns["email"], $columns["uid"], $columns["total_amount"], 'alipay_subject', 'alipay_body');
-					}	else if ($request["payment_type"] === 'free') {
-						//直接开始付款后的业务逻辑
-						return after_paid($columns["email"], $columns["uid"], $columns["uid"]);
-					}
-				} else {
-					return new WP_Error( 'database error', '数据库出错', array('status' => '505') );
-				}
+			if ($request["payment_type"] === 'alipay') {
+				//发起支付宝请求
+				// return alipay_pay($request["email"], getOrderNo("ma"), $columns["total_amount"], 'alipay_subject', 'alipay_body');
+			}	else if ($request["payment_type"] === 'free') {	
+				//直接开始付款后的业务逻辑
+				return after_paid($columns);
 			}
 		} else {
 			//验证失败
@@ -955,6 +937,7 @@
 			)
 		);
 	}
+	//支付宝回调方法
 	function alipay_notifyUrl($request){
 		#支付宝请求
 		require_once("utils/payment/payment.php");		

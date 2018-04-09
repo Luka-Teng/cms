@@ -459,6 +459,31 @@ jQuery(document).ready(function($) {
 			})
 		})
 	})
+	//发送手机验证码
+	$(function () {
+		$("#get-phonecode-btn").click(function () {
+			showLoading ()
+			var url = magicalData.siteURL + '/wp-json/apis/phone_code'
+			var phone = $("#phone").val()
+			$.ajax({
+				type: 'post',
+				url: url,
+				data: {
+					phone: phone
+				},
+			    success: function (data) {
+					refreshLoading ()
+			    	console.log(data)
+					showflash('已发送，请查收', 'success')
+			    },
+			    error: function (data) {
+					refreshLoading ()
+			    	showError(data)
+					showflash('发送失败', 'error')
+			    }
+			})
+		})
+	})
 	//创建媒体申请人
 	$(function () {
 		$("#create_media_applicant").click(function (e) {
@@ -487,6 +512,7 @@ jQuery(document).ready(function($) {
 					company: $("#company").val(),
 					job: $("#job").val(),
 					phone: $("#phone").val(),
+					phone_code: $("#phone_code").val(),
 					type: $("#type").val(),
 					payment_type: $("#payment_type").val(),
 					tickets: JSON.stringify(tickets)
