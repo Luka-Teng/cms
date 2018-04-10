@@ -718,8 +718,8 @@
 	//验证电话和验证码的匹配
 	function checkout_phone_code($phone, $code) {
 		require_once("utils/msg/msg.php");
-		$AppKey = '96690ef8af4213bfa978d47d465a247d';
-		$AppSecret = 'e5aa4487c2b2';
+		$AppKey = 'a40ff03c4f7f3cc3243ea235a8b0332e';
+		$AppSecret = '1a384cdd9931';
 		$p = new ServerAPI($AppKey,$AppSecret,'curl');
 		$result = $p->verifySmsCode($phone, $code);
 		if ($result['code'] == '200') {
@@ -748,10 +748,10 @@
 	}
 	function phone_code($request) {
 		require_once("utils/msg/msg.php");
-		$AppKey = '96690ef8af4213bfa978d47d465a247d';
-		$AppSecret = 'e5aa4487c2b2';
+		$AppKey = 'a40ff03c4f7f3cc3243ea235a8b0332e';
+		$AppSecret = '1a384cdd9931';
 		$p = new ServerAPI($AppKey,$AppSecret,'curl');
-		$result = $p->sendSmsCode('3962603',$request['phone'],'','6');
+		$result = $p->sendSmsCode('3872662',$request['phone'],'','6');
 		if ($result['code'] == '200') {
 			return array(
 				'status' => '200',

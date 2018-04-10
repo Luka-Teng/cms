@@ -440,6 +440,7 @@ jQuery(document).ready(function($) {
 			showLoading ()
 			var url = magicalData.siteURL + '/wp-json/apis/email_code'
 			var email = $("#email").val()
+			var that = this
 			$.ajax({
 				type: 'post',
 				url: url,
@@ -448,6 +449,17 @@ jQuery(document).ready(function($) {
 				},
 			    success: function (data) {
 					refreshLoading ()
+					$(that).prop('disabled', true)
+					var count = 60
+					var timer = setInterval(function () {
+						count--
+						$(that).html('('+count+')')
+						if (count === 0) {
+							$(that).prop('disabled', false)
+							clearInterval(timer)
+							$(that).html('获取验证码')
+						}								
+					}, 1000)
 			    	console.log(data)
 					showflash('已发送，请查收', 'success')
 			    },
@@ -465,6 +477,7 @@ jQuery(document).ready(function($) {
 			showLoading ()
 			var url = magicalData.siteURL + '/wp-json/apis/phone_code'
 			var phone = $("#phone").val()
+			var that = this
 			$.ajax({
 				type: 'post',
 				url: url,
@@ -473,6 +486,17 @@ jQuery(document).ready(function($) {
 				},
 			    success: function (data) {
 					refreshLoading ()
+					$(that).prop('disabled', true)
+					var count = 60
+					var timer = setInterval(function () {
+						count--
+						$(that).html('('+count+')')
+						if (count === 0) {
+							$(that).prop('disabled', false)
+							clearInterval(timer)
+							$(that).html('获取验证码')
+						}								
+					}, 1000)
 			    	console.log(data)
 					showflash('已发送，请查收', 'success')
 			    },
