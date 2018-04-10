@@ -834,7 +834,7 @@
 		$columns["total_amount"] = $data["total_amount"];
 		$columns["payment_type"] = $data["payment_type"];
 		
-		//插入新用户，状态为unpaid			
+		//插入新用户			
 		$query = $wpdb->insert( 
 			APPLICANT_TABLE, 
 			$columns
@@ -844,7 +844,7 @@
 			$code_html = generateBarcode($columns["uid"]);
 			$email_result = sendEmail(
 				$columns["email"],
-				"no-reply", 
+				"csjbrandexpo", 
 				"
 				<h1>这是您入场用的条形码。<h1>
 				<h5>请妥善保管。</h5>
@@ -865,6 +865,7 @@
 	}
 
 	//支付宝付款方法
+	/*
 	function alipay_pay($applicant_email, $applicant_uid, $total_amount, $subject, $body) {
 		#支付宝请求
 		require_once("utils/payment/payment.php");						
@@ -881,6 +882,7 @@
 		));						
 		return $result;
 	}
+	*/
 
 	function create_applicant($request){
 		//检查验证码是否正确
@@ -938,6 +940,7 @@
 		);
 	}
 	//支付宝回调方法
+	/*
 	function alipay_notifyUrl($request){
 		#支付宝请求
 		require_once("utils/payment/payment.php");		
@@ -1001,7 +1004,7 @@
 			return 'fail';
 		}		
 	}
-	
+	*/
 	/******************************************************/
 	
 	//define excel api

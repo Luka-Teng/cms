@@ -129,7 +129,7 @@
 				</div>
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
-						<button type="button" class="btn btn-default" id="create_media_applicant">确认</button>
+						<button type="button" class="btn btn-default" id="create_media_applicant" disabled>确认</button>
 					</div>
 				</div>
 			</form>

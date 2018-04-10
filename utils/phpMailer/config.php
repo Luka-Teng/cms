@@ -1,8 +1,8 @@
 <?php
 	$emailConfig = Array(
-		'host' => 'smtp.qq.com',
-		'from_name' => 'no reply',
-		'from_email' => '359593891@qq.com',		
-		'from_password' => 'ftnyaerjezmubjdb',
+		'host' => 'smtp.163.com',
+		'from_name' => 'csjbrandexpo',
+		'from_email' => 'csjbrandexpo@163.com',		
+		'from_password' => 'csjzwh2018',
 	);
 ?>
