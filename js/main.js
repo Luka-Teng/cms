@@ -521,7 +521,7 @@ jQuery(document).ready(function($) {
 				return $(this).hasClass("btn-active")
 			})
 			.each(function () {			
-				tickets.push($(this).data("tickettype") + "_" + $(this).data("ticketdate"))
+				tickets.push($(this).data("tickettype") + "-" + $(this).data("ticketdate"))
 				total_amount += parseFloat($(this).data("ticketprice"))
 			})
 			//这个是用来前台呈现的
@@ -565,11 +565,10 @@ jQuery(document).ready(function($) {
 			showLoading ()
 			var url = magicalData.siteURL + '/wp-json/apis/quick_applicant'
 			if ($("#type").val() === 'media') {
-				var tickets = $("#media_type").val()
+				var tickets = [$("#media_type").val()]
 			} else {
-				var tickets = $("#audience_type").val()
+				var tickets = [$("#audience_type").val()]
 			}
-			console.log(tickets)
 			$.ajax({
 				type: 'post',
 				url: url,
@@ -596,14 +595,15 @@ jQuery(document).ready(function($) {
 		})
 	})
 	//确认进场
-	function checkin(uids) {
+	function checkin(uids, date) {
 		showLoading ()
-		var url = magicalData.siteURL + '/wp-json/apis/checkin'
+		var url = magicalData.siteURL + '/wp-json/apis/check_in'
 		$.ajax({
 			type: 'post',
 			url: url,
 			data: {
-				uids: JSON.stringify(uids)
+				uids: JSON.stringify(uids),
+				date: date
 			},
 			beforeSend: function (xhr) {
 				xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
@@ -623,9 +623,10 @@ jQuery(document).ready(function($) {
 	$(function () {
 		$("#scanning").keydown(function (e) {
 			if (e.keyCode == 13) {
-				var uids = []
+				var uids = [], date
 				uids.push($(this).val())
-				checkin(uids)
+				date = $("#today").val()
+				checkin(uids, date)
 				$(this).val('')
 			}
 		})

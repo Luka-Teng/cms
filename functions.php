@@ -197,7 +197,7 @@
 				payment_type varchar(20) NOT NULL DEFAULT 'free',
 				total_amount varchar(20) NOT NULL DEFAULT '0.00',
 				tickets varchar(1000) DEFAULT '[]',
-				checked varchar(20) DEFAULT 'unchecked' NOT NULL,
+				checked varchar(20) DEFAULT '[]' NOT NULL,
 		        UNIQUE KEY id (id)
 		    ) $charset_collate;";
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -944,6 +944,9 @@
 			array(
 				'methods'  => 'POST',
 				'callback' => 'quick_applicant',
+				'permission_callback' => function () {
+					return isEditor();
+				},
 				'args' => array(
 				  'phone' => array(
 					'validate_callback' => function ($param) {
@@ -962,13 +965,10 @@
 				  ),
 				  'tickets' => array(
 					'validate_callback' => function ($param) {
-						return count(json_decode($param)) !== 0;
+						return count(json_decode($param)) == 1;
 					}
 				  )
-				),
-				'permission_callback' => function () {
-					return isEditor();
-				}
+				)	
 			)
 		);
 	}
@@ -986,6 +986,7 @@
 		$columns["tickets"] = $request["tickets"];
 		$columns["payment_type"] = 'offline';
 		$columns["trade_no"] = $columns["uid"];
+		$columns["checked"] = $request["tickets"];
 		if ($tickets) {
 			foreach ($tickets as $ticket) {
 				if (in_array($ticket->uid, json_decode($request["tickets"]))) {
@@ -1010,17 +1011,22 @@
 	}
 	/******************************************************/
 	//确认入场
-	add_action( 'rest_api_init', 'checkin_hook' );
-	function checkin_hook() {
+	add_action( 'rest_api_init', 'check_in_hook' );
+	function check_in_hook() {
 		register_rest_route(
-			'apis', 'checkin',
+			'apis', 'check_in',
 			array(
 				'methods'  => 'POST',
-				'callback' => 'checkin',
+				'callback' => 'check_in',
 				'args' => array(
 				  'uids' => array(
 					'validate_callback' => function ($param) {
 						return count(json_decode($param)) !== 0;
+					}
+				  ),
+				  'date' => array(
+					'validate_callback' => function ($param) {
+						return isNotNull($param);
 					}
 				  )
 				),
@@ -1030,20 +1036,32 @@
 			)
 		);
 	}
-	function checkin($request) {
+	function check_in($request) {
 		global $wpdb;
 		$uids = json_decode($request["uids"]);
+		$date = $request['date'];
+		$media_ticket = 'media-' . $date;
+		$audience_ticket = 'audience-' . $date;
 		$wpdb->query('START TRANSACTION');
 		$ts = [];
 		$ok = true;
 		foreach ($uids as $uid) {
 			$ts[$uid . '1'] = $wpdb -> get_results('SELECT * FROM ' . APPLICANT_TABLE . " WHERE uid='{$uid}'", OBJECT);
-			if (!$ts[$uid . '1'] || ($ts[$uid . '1'][0] -> checked != 'unchecked') ) {
-				$ok = false;
-				break;
-			}
-			$ts[$uid . '2'] = $wpdb -> update(APPLICANT_TABLE, array('checked' => 'checked'), array('uid' => $uid));
-			if (!$ts[$uid . '2']) {
+			if ($ts[$uid . '1']) {
+				// 判断是什么类型
+				$ts[$uid . '1'][0]->type == 'media' ? $ticket = $media_ticket : $ticket = $audience_ticket;
+				$checked_tickets = json_decode($ts[$uid . '1'][0]->checked);
+				$tickets_bought = json_decode($ts[$uid . '1'][0]->tickets);
+				// 判断票是否已经checkin并且是否存在
+				if (!in_array($ticket, $checked_tickets) && in_array($ticket, $tickets_bought)) {
+					array_push($checked_tickets, $ticket);
+					$ts[$uid . '2'] = $wpdb -> update(APPLICANT_TABLE, array('checked' => json_encode($checked_tickets)), array('uid' => $uid));
+					continue;
+				} else {
+					$ok = false;
+					break;
+				}
+			} else {
 				$ok = false;
 				break;
 			}
@@ -1056,7 +1074,7 @@
 			);
 		} else {
 			$wpdb->query('ROLLBACK');
-			return new WP_Error( 'database error', '入场失败， 存在重复刷票可能', array('status' => '505') );
+			return new WP_Error( 'database error', '入场失败， 不存在票或重复刷票可能', array('status' => '505') );
 		}
 	}
 	/******************************************************/

@@ -2,13 +2,16 @@
 <?php if (current_user_can( 'editor' )) : ?>
 	<div class="clearfix">
 		<div class="title top-gap-1 bot-gap-1" style="margin-left:15px">扫码确认</div>
+		<div class="form-group col-5 pull-left general-padding">
+			<input id="today" type="date" name="today" class="form-control">
+		</div>
 		<div class="form-group col-12 pull-left general-padding">
 			<input id="scanning" type="text" name="scaning" class="form-control">
 		</div>
 		
 		<div class="title top-gap-1 bot-gap-1" style="margin-left:15px">人工确认</div>
 		<?php global $wpdb ?>
-		<?php $check_phone = $_GET['check_phone'] ?>
+		<?php $check_phone = $_GET['check_phone'] ? $_GET['check_phone'] : ''?>
 		<?php $unchecked_applicant = $wpdb -> get_results( 'SELECT * FROM ' . APPLICANT_TABLE . " WHERE phone='{$check_phone}' AND checked='unchecked'", OBJECT );?>
 		<form method="GET" action="">
 			<div class="form-group col-4 pull-left general-padding">
@@ -38,17 +41,17 @@
 		<?php $result_audience = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . 'ticket where type = "audience"', OBJECT ) ?>
 		<div class="form-group col-4 pull-left general-padding" style="display: none" id="media_show">
 			<label>媒体票 : </label>
-			<select name="type" type="text" class="form-control" id="media_type" multiple>
+			<select name="type" type="text" class="form-control" id="media_type">
 				<?php foreach($result_media as $result) { ?>
-					<option value="media_<?php echo $result->date ?>"><?php echo $result->date ?></option>
+					<option value="media-<?php echo $result->date ?>"><?php echo $result->date ?></option>
 				<?php } ?>
 			</select>
 		</div>
 		<div class="form-group col-4 pull-left general-padding" id="audience_show">
 			<label>个人观众票 : </label>
-			<select name="type" type="text" class="form-control" id="audience_type" multiple>
+			<select name="type" type="text" class="form-control" id="audience_type">
 				<?php foreach($result_audience as $result) { ?>
-					<option value="audience_<?php echo $result->date ?>"><?php echo $result->date ?></option>
+					<option value="audience-<?php echo $result->date ?>"><?php echo $result->date ?></option>
 				<?php } ?>
 			</select>
 		</div>
