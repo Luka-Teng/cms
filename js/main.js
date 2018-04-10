@@ -419,7 +419,7 @@ jQuery(document).ready(function($) {
 				data: data,
 			    success: function (data) {
 			    	if (data.status === 'success') {
-			    		window.location = '/admin'
+			    		window.location = '/admin-home'
 			    	} else if (data.status === 'error') {
 			    		refreshLoading ()
 			    		showError(data.message)
@@ -558,7 +558,78 @@ jQuery(document).ready(function($) {
 			})
 		})
 	})
-	
+	//快速媒体申请人
+	$(function () {
+		$("#quick-ticket").click(function (e) {
+			e.preventDefault()
+			showLoading ()
+			var url = magicalData.siteURL + '/wp-json/apis/quick_applicant'
+			if ($("#type").val() === 'media') {
+				var tickets = $("#media_type").val()
+			} else {
+				var tickets = $("#audience_type").val()
+			}
+			console.log(tickets)
+			$.ajax({
+				type: 'post',
+				url: url,
+				data: {
+					name: $("#name").val(),
+					phone: $("#phone").val(),
+					type: $("#type").val(),
+					tickets: JSON.stringify(tickets)
+				},
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
+				},
+			    success: function (data) {
+					refreshLoading ()
+			    	console.log(data)
+					showflash('创建成功', 'success')								
+			    },
+			    error: function (data) {
+					refreshLoading ()
+			    	showError(data)
+					showflash('创建失败', 'error')
+			    }
+			})
+		})
+	})
+	//确认进场
+	function checkin(uids) {
+		showLoading ()
+		var url = magicalData.siteURL + '/wp-json/apis/checkin'
+		$.ajax({
+			type: 'post',
+			url: url,
+			data: {
+				uids: JSON.stringify(uids)
+			},
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader('X-WP-Nonce', magicalData.nonce)
+			},
+			success: function (data) {
+				refreshLoading ()
+				console.log(data)
+				showflash('入场成功', 'success')								
+			},
+			error: function (data) {
+				refreshLoading ()
+				showError(data)
+				showflash('入场失败', 'error')
+			}
+		})
+	}
+	$(function () {
+		$("#scanning").keydown(function (e) {
+			if (e.keyCode == 13) {
+				var uids = []
+				uids.push($(this).val())
+				checkin(uids)
+				$(this).val('')
+			}
+		})
+	})
 	//创建票务
 	$(function () {
 		$("#new-ticket").click(function (e) {

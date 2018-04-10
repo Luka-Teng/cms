@@ -15,9 +15,13 @@
   <div class="clearfix">
     <a href="javascript:void(0)" id="login-btn" class="btn btn-primary pull-right top-gap-1 right-gap-1">LOGIN</a>
   </div>
-<?php else : ?>
+<?php elseif (isAdministrator()) : ?>
   <script>
-    window.location = '/'
+    window.location = '/admin-home'
   </script>
+<?php elseif (isEditor()) : ?>
+	<script>
+		window.location = '/admin-check'
+	</script>
 <?php endif ?>
 <?php get_footer('admin'); ?>

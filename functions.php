@@ -284,6 +284,15 @@
 		}
 	}
 	
+	//if it is editor，检票员角色?
+	function isEditor() {
+		if (current_user_can( 'editor' )) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	/******************************************************/
 	
 	//define the login api 
@@ -926,6 +935,130 @@
 		
 	}
 	
+	/******************************************************/
+	//自助快捷购票，只需要提供名字， 电话, 票
+	add_action( 'rest_api_init', 'quick_applicant_hook' );
+	function quick_applicant_hook() {
+		register_rest_route(
+			'apis', 'quick_applicant',
+			array(
+				'methods'  => 'POST',
+				'callback' => 'quick_applicant',
+				'args' => array(
+				  'phone' => array(
+					'validate_callback' => function ($param) {
+						return isPhone($param);
+					}
+				  ),
+				  'name' => array(
+					'validate_callback' => function ($param) {
+						return isNotNull($param);
+					}
+				  ),
+				  'type' => array(
+					'validate_callback' => function ($param) {
+						return isInArray($param, ['audience', 'media']);
+					}
+				  ),
+				  'tickets' => array(
+					'validate_callback' => function ($param) {
+						return count(json_decode($param)) !== 0;
+					}
+				  )
+				),
+				'permission_callback' => function () {
+					return isEditor();
+				}
+			)
+		);
+	}
+	function quick_applicant($request) {
+		global $wpdb;
+		$tickets = $wpdb->get_results( 'SELECT * FROM ' . TICKET_TABLE, OBJECT );
+		$columns["uid"] = getOrderNo("ma");
+		$columns["total_amount"] = 0.00;
+		$columns["email"] = 'user@user.com';
+		$columns["name"] = $request["name"];
+		$columns["company"] = 'user';
+		$columns["job"] = 'user';
+		$columns["phone"] = $request["phone"];
+		$columns["type"] = $request["type"];
+		$columns["tickets"] = $request["tickets"];
+		$columns["payment_type"] = 'offline';
+		$columns["trade_no"] = $columns["uid"];
+		if ($tickets) {
+			foreach ($tickets as $ticket) {
+				if (in_array($ticket->uid, json_decode($request["tickets"]))) {
+					$columns["total_amount"] +=  number_format($ticket->price, 2, '.', '');
+				}
+			}
+		} else {
+			return new WP_Error( 'database error', '数据库出错', array('status' => '505') );
+		}
+		$query = $wpdb->insert( 
+			APPLICANT_TABLE, 
+			$columns
+		);
+		if (!$query) {
+			return new WP_Error( 'database error', '数据库出错', array('status' => '505') );
+		} else {
+			return array(
+        		'status' => 'success',
+        		'message' => '购买成功'
+			);
+		}
+	}
+	/******************************************************/
+	//确认入场
+	add_action( 'rest_api_init', 'checkin_hook' );
+	function checkin_hook() {
+		register_rest_route(
+			'apis', 'checkin',
+			array(
+				'methods'  => 'POST',
+				'callback' => 'checkin',
+				'args' => array(
+				  'uids' => array(
+					'validate_callback' => function ($param) {
+						return count(json_decode($param)) !== 0;
+					}
+				  )
+				),
+				'permission_callback' => function () {
+					return isEditor();
+				}
+			)
+		);
+	}
+	function checkin($request) {
+		global $wpdb;
+		$uids = json_decode($request["uids"]);
+		$wpdb->query('START TRANSACTION');
+		$ts = [];
+		$ok = true;
+		foreach ($uids as $uid) {
+			$ts[$uid . '1'] = $wpdb -> get_results('SELECT * FROM ' . APPLICANT_TABLE . " WHERE uid='{$uid}'", OBJECT);
+			if (!$ts[$uid . '1'] || ($ts[$uid . '1'][0] -> checked != 'unchecked') ) {
+				$ok = false;
+				break;
+			}
+			$ts[$uid . '2'] = $wpdb -> update(APPLICANT_TABLE, array('checked' => 'checked'), array('uid' => $uid));
+			if (!$ts[$uid . '2']) {
+				$ok = false;
+				break;
+			}
+		}
+		if ($ok) {
+			$wpdb->query('COMMIT');
+			return array(
+        		'status' => 'success',
+        		'message' => '入场成功'
+			);
+		} else {
+			$wpdb->query('ROLLBACK');
+			return new WP_Error( 'database error', '入场失败， 存在重复刷票可能', array('status' => '505') );
+		}
+	}
 	/******************************************************/
 	
 	//定义alipay的notifyUrl接口
