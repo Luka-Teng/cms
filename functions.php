@@ -842,7 +842,7 @@
 		$columns["tickets"] = $data["tickets"];
 		$columns["total_amount"] = $data["total_amount"];
 		$columns["payment_type"] = $data["payment_type"];
-		
+		$columns["trade_no"] = $data["trade_no"];
 		//插入新用户			
 		$query = $wpdb->insert( 
 			APPLICANT_TABLE, 
@@ -912,6 +912,7 @@
 			$columns["type"] = $request["type"];
 			$columns["tickets"] = $request["tickets"];
 			$columns["payment_type"] = $request["payment_type"];
+			$columns["trade_no"] = $request["trade_no"];
 			if ($tickets) {
 				foreach ($tickets as $ticket) {
 					if (in_array($ticket->uid, json_decode($request["tickets"]))) {
