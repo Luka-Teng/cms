@@ -148,7 +148,7 @@
 					location.reload()		
 				},
 				error: function (data) {
-					console.log(data)
+					location.reload()
 				}
 			})
 		}
