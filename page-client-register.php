@@ -62,7 +62,7 @@
 						<input name="phone" type="text" class="form-control input-erik" id="phone" placeholder="请输入手机号">
 					</div>
 					<div class="col-sm-3">
-						<button disabled type="button" style="width: 100%;" id="get-phonecode-btn" class="btn btn-primary">获取验证码</button>
+						<button type="button" style="width: 100%;" id="get-phonecode-btn" class="btn btn-primary">获取验证码</button>
 					</div>
 				</div>
 				<div class="form-group">
@@ -129,7 +129,7 @@
 				</div>
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
-						<button type="button" class="btn btn-default" id="create_media_applicant" disabled>确认</button>
+						<button type="button" class="btn btn-default" id="create_media_applicant">确认</button>
 					</div>
 				</div>
 			</form>
