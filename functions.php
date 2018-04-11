@@ -912,7 +912,6 @@
 			$columns["type"] = $request["type"];
 			$columns["tickets"] = $request["tickets"];
 			$columns["payment_type"] = $request["payment_type"];
-			$columns["trade_no"] = $request["trade_no"];
 			if ($tickets) {
 				foreach ($tickets as $ticket) {
 					if (in_array($ticket->uid, json_decode($request["tickets"]))) {
@@ -927,6 +926,7 @@
 				// return alipay_pay($request["email"], getOrderNo("ma"), $columns["total_amount"], 'alipay_subject', 'alipay_body');
 			}	else if ($request["payment_type"] === 'free') {	
 				//直接开始付款后的业务逻辑
+				$columns["trade_no"] = $columns["uid"];
 				return after_paid($columns);
 			}
 		} else {
