@@ -563,11 +563,12 @@ jQuery(document).ready(function($) {
 		$("#quick-ticket").click(function (e) {
 			e.preventDefault()
 			showLoading ()
+			var tickets = []
 			var url = magicalData.siteURL + '/wp-json/apis/quick_applicant'
 			if ($("#type").val() === 'media') {
-				var tickets = [$("#media_type").val()]
+				$("#media_type").val() ?  tickets = [$("#media_type").val()] : ''
 			} else {
-				var tickets = [$("#audience_type").val()]
+				$("#audience_type").val() ?  tickets = [$("#audience_type").val()] : ''
 			}
 			$.ajax({
 				type: 'post',
@@ -583,6 +584,8 @@ jQuery(document).ready(function($) {
 				},
 			    success: function (data) {
 					refreshLoading ()
+					$("#name").val('')
+					$("#phone").val('')
 			    	console.log(data)
 					showflash('创建成功', 'success')								
 			    },
@@ -624,7 +627,7 @@ jQuery(document).ready(function($) {
 		$("#scanning").keydown(function (e) {
 			if (e.keyCode == 13) {
 				var uids = [], date
-				uids.push($(this).val())
+				$(this).val() ? uids.push($(this).val()) : ''
 				date = $("#today").val()
 				checkin(uids, date)
 				$(this).val('')

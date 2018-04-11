@@ -197,7 +197,7 @@
 				payment_type varchar(20) NOT NULL DEFAULT 'free',
 				total_amount varchar(20) NOT NULL DEFAULT '0.00',
 				tickets varchar(1000) DEFAULT '[]',
-				checked varchar(20) DEFAULT '[]' NOT NULL,
+				checked varchar(1000) DEFAULT '[]' NOT NULL,
 		        UNIQUE KEY id (id)
 		    ) $charset_collate;";
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -365,7 +365,7 @@
 		$columns['date'] = $request['date'];
 		$columns['type'] = $request['type'];
 		$columns['price'] = $request['price'];
-		$columns['uid'] = $request['type'] . '_' . $request['date'];
+		$columns['uid'] = $request['type'] . '-' . $request['date'];
 		$sql = $wpdb->insert( 
 			TICKET_TABLE, 
 			$columns

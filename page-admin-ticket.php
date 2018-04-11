@@ -43,7 +43,7 @@
 							<td><?php echo $ticket->type ?></td>
 							<td><?php echo $ticket->date?></td>
 							<td><?php echo $ticket->price ?></td>
-							<td><a href="javascript:void(0)" data-ticket="<?php echo $ticket->type ?>_<?php echo $ticket->date ?>" class="del-ticket">删除</a></td>
+							<td><a href="javascript:void(0)" data-ticket="<?php echo $ticket->uid ?>" class="del-ticket">删除</a></td>
 						</tr>
 					<?php } ?>
 				</tbody>
